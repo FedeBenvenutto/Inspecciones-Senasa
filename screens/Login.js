@@ -27,7 +27,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [nombre, setNombre] = useState("");
   const { expoPushToken } = useContext(NotificationContext);
-  const { setUsers, loading, setLoading, setCurrentUserId, takeUsers } = useContext(UserContext);
+  const { loading, setLoading, setCurrentUserId, takeUsers } = useContext(UserContext);
   useEffect(() => {
     setLoading(true);
     const unsubscribe = auth.onAuthStateChanged((data) => {

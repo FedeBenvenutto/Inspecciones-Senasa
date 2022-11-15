@@ -80,24 +80,6 @@ const VerIngresos = (props) => {
     });
     return unsuscribe;
   }, [orden]);
-  // const handleDelete = async () => {
-  //   if (textAlert == "confirmar") {
-  //     try {
-  //       settextAlert("");
-  //       ingreso.map(async (persona) => {
-  //         const docRef = doc(db, user, persona.id);
-  //         await deleteDoc(docRef);
-  //         console.log("Confirmado");
-  //       });
-  //       setLoading(false);
-  //       setalertVisible(false);
-  //     } catch (error) {
-  //       Alert.alert(error);
-  //       setLoading(false);
-  //       setalertVisible(false);
-  //     }
-  //   }
-  // };
 
   const alertaConfirmacion = () => {
     Alert.alert(

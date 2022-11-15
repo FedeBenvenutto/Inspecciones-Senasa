@@ -7,6 +7,7 @@ import { NotificationsProvider } from "./Context/Notifications";
 import VerIngresos from "./screens/VerIngresos";
 import NuevoIngreso from "./screens/NuevoIngreso";
 import IngresoDetalle from "./screens/IngresoDetalle";
+import Actas from "./screens/Actas";
 
 const Stack = createStackNavigator();
 function MyStack() {
@@ -30,7 +31,12 @@ function MyStack() {
       <Stack.Screen
         name="IngresoDetalle"
         component={IngresoDetalle}
-        options={{ title: "Detalle del Ingreso" }}
+        options={{ title: "Detalle" }}
+      />
+      <Stack.Screen
+        name="Actas"
+        component={Actas}
+        options={{ title: "Actas" }}
       />
     </Stack.Navigator>
   );

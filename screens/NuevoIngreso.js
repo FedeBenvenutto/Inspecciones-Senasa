@@ -20,9 +20,7 @@ const heightY = Dimensions.get("window").height;
 
 const NuevoIngreso = (props) => {
   const { user, setUser } = useContext(UserContext);
-  // const [TotalPersona, setTotalPersona] = useState(
-  //   Number(props.route.params.TotalPersonas) + 1
-  // );
+  const { sendPushNotification } = useContext(NotificationContext);
   const inicialState = {
     Renfo: "",
     Nombre: "",
@@ -36,7 +34,7 @@ const NuevoIngreso = (props) => {
     FechaHabilitacion: "",
     Vencimiento: "",
     Observaciones: "",
-    Actas: "",
+    // Actas: "",
     Notificacion: ""
   }
   const [ingreso, setIngreso] = useState(inicialState);
@@ -49,15 +47,6 @@ const NuevoIngreso = (props) => {
     });
   };
   const saveNewIngreso = async () => {
-    
-    // let prioridad = Number(ingreso.Prioridad);
-    // let nuevaPersona = ingreso;
-    // if (!prioridad || prioridad < -99 || prioridad > 999) {
-    //   Alert.alert(
-    //     "",
-    //     "El número de prioridad no es correcto, debe ser mayor a -100 y menor a 1000"
-    //   );
-    // } else 
     if (!ingreso.Nombre) {
       Alert.alert("", "Complete todos los campos");
     } else
@@ -76,7 +65,7 @@ const NuevoIngreso = (props) => {
           FechaHabilitacion: ingreso.FechaHabilitacion,
           Vencimiento: ingreso.Vencimiento,
           Observaciones: ingreso.Observaciones,
-          Actas: ingreso.Actas,
+          // Actas: ingreso.Actas,
           Notificacion: ingreso.Notificacion,
           createdAt: new Date(),
         });

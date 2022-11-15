@@ -156,7 +156,7 @@ const handleText = (date) => {
           }
         ></TextInput>
       </SafeAreaView>
-      <SafeAreaView style={styles.formulario}>
+      {/* <SafeAreaView style={styles.formulario}>
         <Text style={styles.text}> Actas</Text>
         <TextInput
           style={styles.input3}
@@ -166,7 +166,7 @@ const handleText = (date) => {
             setIngreso({ ...ingreso, Actas: value })
           }
         ></TextInput>
-      </SafeAreaView>
+      </SafeAreaView> */}
     </>
   );
 };

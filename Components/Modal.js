@@ -30,7 +30,7 @@ export default function MyModal({
       <View style={styles.modalContainer}>
         <View style={styles.modal}>
           <Text style={styles.text2}>
-            {ingresoinModal.Nombre.toUpperCase()}
+            {ingresoinModal.Nombre ? ingresoinModal.Nombre.toUpperCase() : ""}
           </Text>
           <Text style={styles.text}>
             Renfo: {ingresoinModal.Renfo}
@@ -71,9 +71,19 @@ export default function MyModal({
             Fecha Notificación: {ingresoinModal.Notificacion 
             && handleText(ingresoinModal.Notificacion.toDate())}
           </Text>
-          <Text style={styles.text}>
+          <TouchableOpacity
+            onPress={() => {
+              setIsModalOpen(!setIsModalOpen);
+              props.navigation.navigate("Actas", {
+                ingresoId: ingresoinModal.id,
+              });
+            }}
+          >
+            <Text style={styles.text}>
             Ver Actas
           </Text>
+          </TouchableOpacity>
+          
           <TouchableOpacity
             onPress={() => {
               setIsModalOpen(!setIsModalOpen);
