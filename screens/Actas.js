@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useContext } from "react";
 import {
   Image,
   View,
@@ -24,6 +24,7 @@ import {
   deleteObject,
 } from "firebase/storage";
 import ImageViewer from "react-native-image-zoom-viewer";
+import { NotificationContext } from "../Context/Notifications.js";
 
 const Actas = (props) => {
   const [images, setImages] = useState([]);
@@ -36,6 +37,7 @@ const Actas = (props) => {
   const [type, setType] = useState(Camera.Constants.Type.back);
   const [flash, setFlash] = useState(Camera.Constants.FlashMode.off);
   const cameraRef = useRef(null);
+  const { sendPushNotification } = useContext(NotificationContext);
 
   const takeImages = async () => {
     setImages([]);
@@ -92,6 +94,7 @@ const Actas = (props) => {
     );
     uploadBytes(storageRef, blob)
       .then(() => {
+        sendPushNotification(props.route.params.ingreso, "agregó un acta en");
         takeImages().catch((error) => {
           setLoading(false);
           Alert.alert("", error);
@@ -159,9 +162,6 @@ const Actas = (props) => {
       // aspect: [6, 9],
       quality: 1,
     });
-    if (result.cancelled) {
-      console.log("Cancelled");
-    }
     if (!result.cancelled) {
       uploadImage(result.uri);
     }
@@ -289,7 +289,6 @@ const Actas = (props) => {
       <ImageViewer
         imageUrls={images}
         saveToLocalByLongPress={false}
-        // enableSwipeDown={true}
         renderIndicator={(e, i) => {
           setImageSelected(e);
         }}
@@ -321,27 +320,6 @@ const Actas = (props) => {
         />
       </Modal>
       <View style={styles.container}>
-        {/* <TouchableOpacity
-            style={{ flexDirection: "row" }}
-            onPress={() => setCamaraOpen(true)}
-          >
-
-            <Text style={styles.text}>Agregar acta desde la cámara</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{ flexDirection: "row" }}
-            onPress={() => pickImage()}
-          >
-
-            <Text style={styles.text}>Agregar acta desde la galaría</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{ flexDirection: "row" }}
-            onPress={() =>  alertaConfirmacion()}
-          >
-
-            <Text style={styles.text}>Borrar imagen </Text>
-          </TouchableOpacity> */}
         <Button
           containerStyle={styles.button}
           title="Agregar acta desde la galería"

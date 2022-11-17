@@ -15,6 +15,9 @@ import Toast from "react-native-toast-message";
 import Formulario from "../Components/Formulario.js";
 // import fondo from "../assets/fondo3.jpg";
 import { UserContext } from "../Context/UserContext";
+import { NotificationContext } from "../Context/Notifications.js";
+import { DatePicker } from "react-native-woodpicker";
+
 
 const heightY = Dimensions.get("window").height;
 
@@ -38,18 +41,23 @@ const NuevoIngreso = (props) => {
     Notificacion: ""
   }
   const [ingreso, setIngreso] = useState(inicialState);
+  
   const [loading, setLoading] = useState(false);
-  console.log(ingreso)
+
+
   const showToast = () => {
     Toast.show({
       type: "success",
       text1: `${ingreso.Nombre} se agregó correctamente`,
     });
   };
+
   const saveNewIngreso = async () => {
     if (!ingreso.Nombre) {
       Alert.alert("", "Complete todos los campos");
-    } else
+    } else if (ingreso.Notificacion < new Date()) {
+      Alert.alert("", "La fecha de notificación debe ser posterior a la actual");
+    } else 
       try {
         setLoading(true);
         const docRef = await addDoc(collection(db, "Viveros"), {
@@ -70,6 +78,7 @@ const NuevoIngreso = (props) => {
           createdAt: new Date(),
         });
         showToast();
+        sendPushNotification(ingreso, "agregó");
         setIngreso(inicialState);
         setLoading(false);
       } catch (e) {

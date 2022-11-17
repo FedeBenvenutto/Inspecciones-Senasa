@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import { Button } from "@rneui/themed";
 import Formulario from "../Components/Formulario.js";
-import { UserContext } from "../Context/UserContext";
+import { NotificationContext } from "../Context/Notifications.js";
 // import fondo from "../assets/fondo3.jpg";
 
 const heightY = Dimensions.get("window").height;
@@ -32,11 +32,12 @@ const IngresoDetalle = (props) => {
     Vencimiento: "",
     Observaciones: "",
     Notificacion: "",
-    Actas: "",
+    // Actas: "",
   }
-  const { user, setUser } = useContext(UserContext);
+
   const [ingreso, setIngreso] = useState(inicialState);
   const [loading, setLoading] = useState(true);
+  const { sendPushNotification } = useContext(NotificationContext);
 
   const getIngresoById = async (id) => {
     const docRef = doc(db,  "Viveros", id);
@@ -84,16 +85,9 @@ const IngresoDetalle = (props) => {
   };
 
   const actualizarIngreso = async () => {
-    // let prioridad = Number(ingreso.Prioridad);
-    // if (!prioridad || prioridad < -99 || prioridad > 999) {
-    //   Alert.alert(
-    //     "",
-    //     "El número de prioridad no es correcto, debe ser mayor a -100 y menor a 1000"
-    //   );
-    // } else 
-    // if (!ingreso.Apellido || !ingreso.Nombre) {
-    //   Alert.alert("", "Complete todos los campos");
-    // } else
+    if (ingreso.Notificacion < new Date()) {
+      Alert.alert("", "La fecha de notificación debe ser posterior a la actual");
+    } else
       try {
         setLoading(true);
         const docRef = doc(db, "Viveros", props.route.params.ingresoId);
@@ -110,11 +104,12 @@ const IngresoDetalle = (props) => {
           FechaHabilitacion: ingreso.FechaHabilitacion,
           Vencimiento: ingreso.Vencimiento,
           Observaciones: ingreso.Observaciones,
-          Actas: ingreso.Actas,
+          // Actas: ingreso.Actas,
           Notificacion: ingreso.Notificacion,
           createdAt: new Date(),
         };
         await setDoc(docRef, data);
+        sendPushNotification(ingreso, "actualizó");
         setLoading(false);
         Alert.alert("", "Actualizado");
         props.navigation.navigate("VerIngresos");
@@ -126,6 +121,7 @@ const IngresoDetalle = (props) => {
   useEffect(() => {
     getIngresoById(props.route.params.ingresoId);
   }, []);
+
   if (loading) {
     return (
       <View style={styles.loader}>

@@ -8,6 +8,15 @@ import VerIngresos from "./screens/VerIngresos";
 import NuevoIngreso from "./screens/NuevoIngreso";
 import IngresoDetalle from "./screens/IngresoDetalle";
 import Actas from "./screens/Actas";
+import * as Notifications from 'expo-notifications';
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
 
 const Stack = createStackNavigator();
 function MyStack() {

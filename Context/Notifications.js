@@ -9,15 +9,6 @@ import * as Notifications from "expo-notifications";
 import * as Device from "expo-device";
 import { UserContext } from "../Context/UserContext";
 
-
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-  }),
-});
-
 export const NotificationContext = createContext();
 export const NotificationsProvider = ({ children }) => {
   const [expoPushToken, setExpoPushToken] = useState("");
@@ -26,15 +17,16 @@ export const NotificationsProvider = ({ children }) => {
   const responseListener = useRef();
   const { currentUserId, users } = useContext(UserContext);
 
-  async function sendPushNotification({ gasto, monto }) {
+  async function sendPushNotification(ingreso, accion) {
+    // console.log(ingreso)
     const currentUser = users.filter((user) => user.Uid === currentUserId);
     const nocurrentUser = users.filter((user) => user.Uid !== currentUserId);
     nocurrentUser.map(async (user) => {
       const message = {
         to: user.Token,
         sound: "default",
-        title: `${currentUser[0].Nombre} actualizó los gastos`,
-        body: `en ${gasto.Categoria} por ${monto}`,
+        title: `${currentUser[0].Nombre} ${accion}  un vivero`,
+        body: `${ingreso.Nombre} de ${ingreso.Localidad}`,
         data: { someData: "goes here" },
       };
       await fetch("https://exp.host/--/api/v2/push/send", {
@@ -45,6 +37,7 @@ export const NotificationsProvider = ({ children }) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(message),
+        
       });
     });
   }

@@ -26,7 +26,13 @@ export default function MyModal({
     return day+"/"+mes+"/"+ano
   }
   return (
-    <Modal visible={isModalOpen} transparent={true} animationType={"slide"}>
+    <Modal 
+    visible={isModalOpen} 
+    transparent={true} 
+    animationType={"slide"}
+    onRequestClose={() => {
+      setIsModalOpen(!isModalOpen);
+    }}>
       <View style={styles.modalContainer}>
         <View style={styles.modal}>
           <Text style={styles.text2}>
@@ -75,6 +81,7 @@ export default function MyModal({
             onPress={() => {
               setIsModalOpen(!setIsModalOpen);
               props.navigation.navigate("Actas", {
+                ingreso: ingresoinModal,
                 ingresoId: ingresoinModal.id,
               });
             }}

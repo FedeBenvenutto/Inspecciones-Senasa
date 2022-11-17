@@ -30,6 +30,7 @@ import { Button } from "@rneui/base";
 import { auth } from "../database/firebase.js";
 import { signOut } from "firebase/auth";
 // import Dialog from "react-native-dialog";
+import * as Notifications from "expo-notifications";
 
 const heightY = Dimensions.get("window").height;
 const VerIngresos = (props) => {
@@ -38,8 +39,7 @@ const VerIngresos = (props) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [ingresoinModal, setIngresoinModal] = useState([]);
   const [orden, setOrden] = useState("vencimiento");
-  // const [alertVisible, setalertVisible] = useState(false);
-  // const [textAlert, settextAlert] = useState(false);
+
   const handleText = (date) => {
     if(!date) {return "No se ha seleccionado ninguna fecha"}
     const ano= date.getFullYear()
@@ -81,6 +81,23 @@ const VerIngresos = (props) => {
     return unsuscribe;
   }, [orden]);
 
+  useEffect(() => {
+    if (ingresos[0]) {
+      Notifications.cancelAllScheduledNotificationsAsync()
+      ingresos.map((ingreso) => {
+        if (ingreso.Vencimiento && ingreso.Notificacion) {
+        let triggerSec = ingreso.Notificacion && Math.ceil((ingreso.Notificacion.toDate() - new Date()) /1000);
+        Notifications.scheduleNotificationAsync({
+          content: {
+            title: `Este es un recordatorio del vivero ${ingreso.Nombre}`,
+            body: `La habilitación vence el día ${handleText(ingreso.Vencimiento.toDate())}`,
+          },
+          trigger: { seconds: triggerSec},
+        })}}
+      )
+    }
+  }, [ingresos])
+  
   const alertaConfirmacion = () => {
     Alert.alert(
       "Cerrando sesión",
@@ -120,33 +137,6 @@ const VerIngresos = (props) => {
 
   return (
     <>
-      {/* <Image source={fondo} style={[styles.image, StyleSheet.absoluteFill]} /> */}
-      {/* <View style={styles.alertContainer}>
-      <Dialog.Container
-        visible={alertVisible}
-        contentStyle={{ borderRadius: 20 }}
-      >
-        <Dialog.Title
-        style={{fontSize: heightY * 0.030, color: 'black'}}
-        >Reinicio de datos</Dialog.Title>
-        <Dialog.Description
-        style={{fontSize: heightY * 0.022, color: 'black'}}
-        >
-          Se borrarán todos los datos. Esta acción no se puede deshacer. Si está
-          seguro escriba: confirmar
-        </Dialog.Description>
-        <Dialog.Input
-          autoCapitalize="none"
-          style={{ fontSize: heightY * 0.026, color: 'black' }}
-          onChangeText={(value) => settextAlert(value.trim())}
-        ></Dialog.Input>
-        <Dialog.Button
-          label="Cancelar"
-          onPress={() => setalertVisible(false)}
-        />
-        <Dialog.Button label="Borrar" onPress={handleDelete} />
-      </Dialog.Container> */}
-      {/* </View> */}
       <View style={styles.container}>
         <TouchableOpacity
           style={styles.text}
@@ -155,11 +145,6 @@ const VerIngresos = (props) => {
          : setOrden("vencimiento")}
         >
           <Text>Ordenado por: {orden}</Text>
-          {/* <Text>
-            {orden === "vencimiento" ? "Ordenar por nombre" 
-            : orden === "nombre" ? "Ordenar por localidad" 
-            : "Ordenar por vencimiento"}
-          </Text> */}
         </TouchableOpacity>
         <ScrollView>
           {ingresos?.map((ingreso) => {
@@ -202,13 +187,6 @@ const VerIngresos = (props) => {
                          Fecha de vencimiento: {handleText(ingreso.Vencimiento.toDate())}
                       </ListItem.Subtitle>
                     )}
-
-
-                    {/* <ListItem.Subtitle
-                    //  style={styles.title}
-                     >
-                      Fecha de vencimiento: {handleText(ingreso.Vencimiento.toDate())}
-                    </ListItem.Subtitle> */}
                     {ingreso.Observaciones && (
                       <ListItem.Subtitle>
                         Observaciones: {ingreso.Observaciones}
@@ -238,14 +216,6 @@ const VerIngresos = (props) => {
       >
         Cerrar sesión
       </Button>
-      {/* <Button
-        containerStyle={styles.button2}
-        color="rgb(221, 83, 83)"
-        onPress={() => setalertVisible(true)}
-      >
-        {" "}
-        Reiniciar{" "}
-      </Button> */}
       <MyModal
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}

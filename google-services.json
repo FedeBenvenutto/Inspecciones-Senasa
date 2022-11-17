@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "331101345655",
+    "project_id": "inspecciones-senasa",
+    "storage_bucket": "inspecciones-senasa.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:331101345655:android:89eafe0bb84b362304f372",
+        "android_client_info": {
+          "package_name": "com.federicoand.InpeccionesSenasa"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "331101345655-f0070rvipt2pqnbc20m3nk8u91dofmhn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB92kloOSfljCsgA5Y2svBUVqGCWzKM9ms"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "331101345655-f0070rvipt2pqnbc20m3nk8u91dofmhn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
