@@ -1,4 +1,4 @@
-import { deleteDoc, doc, getDoc, setDoc } from "firebase/firestore";
+import { deleteDoc, doc, getDoc, setDoc, addDoc, collection } from "firebase/firestore";
 import { db } from "../database/firebase.js";
 import React, { useEffect, useState, useContext } from "react";
 import {
@@ -13,8 +13,7 @@ import {
 } from "react-native";
 import { Button } from "@rneui/themed";
 import Formulario from "../Components/Formulario.js";
-import { NotificationContext } from "../Context/Notifications.js";
-// import fondo from "../assets/fondo3.jpg";
+import { UserContext } from "../Context/UserContext.js";
 
 const heightY = Dimensions.get("window").height;
 const IngresoDetalle = (props) => {
@@ -33,11 +32,13 @@ const IngresoDetalle = (props) => {
     Observaciones: "",
     Notificacion: "",
     // Actas: "",
+    Color: 0
   }
 
   const [ingreso, setIngreso] = useState(inicialState);
   const [loading, setLoading] = useState(true);
-  const { sendPushNotification } = useContext(NotificationContext);
+  const { users, currentUserId } = useContext(UserContext);
+  const currentUser = users.filter((user) => user.Uid === currentUserId);
 
   const getIngresoById = async (id) => {
     const docRef = doc(db,  "Viveros", id);
@@ -62,6 +63,12 @@ const IngresoDetalle = (props) => {
       setLoading(true);
       const docRef = doc(db, "Viveros", props.route.params.ingresoId);
       await deleteDoc(docRef);
+      await addDoc(collection(db, "Registros"), {
+        User: currentUser[0].Nombre,
+        Nombre: ingreso.Nombre,
+        Accion: "eliminó el vivero",
+        createdAt: new Date(),
+      });
       setLoading(false);
       Alert.alert("", "Borrado");
       props.navigation.navigate("VerIngresos");
@@ -85,7 +92,7 @@ const IngresoDetalle = (props) => {
   };
 
   const actualizarIngreso = async () => {
-    if (ingreso.Notificacion < new Date()) {
+    if (ingreso.Notificacion && ingreso.Notificacion < new Date()) {
       Alert.alert("", "La fecha de notificación debe ser posterior a la actual");
     } else
       try {
@@ -107,9 +114,16 @@ const IngresoDetalle = (props) => {
           // Actas: ingreso.Actas,
           Notificacion: ingreso.Notificacion,
           createdAt: new Date(),
+          Color: ingreso.Color
         };
         await setDoc(docRef, data);
-        sendPushNotification(ingreso, "actualizó");
+        await addDoc(collection(db, "Registros"), {
+          User: currentUser[0].Nombre,
+          Nombre: ingreso.Nombre,
+          Accion: "actualizó el vivero",
+          createdAt: new Date(),
+        });
+        // sendPushNotification(ingreso, "actualizó");
         setLoading(false);
         Alert.alert("", "Actualizado");
         props.navigation.navigate("VerIngresos");

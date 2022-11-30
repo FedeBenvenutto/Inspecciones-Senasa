@@ -41,6 +41,7 @@ export default function MyModal({
           <Text style={styles.text}>
             Renfo: {ingresoinModal.Renfo}
           </Text>
+          {/* <Text style={styles.text}>Datos de contacto</Text> */}
           <Text style={styles.text}>
             Titular: {ingresoinModal.Titular}
           </Text>

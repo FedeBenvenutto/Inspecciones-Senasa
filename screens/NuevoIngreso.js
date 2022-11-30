@@ -19,10 +19,13 @@ import { NotificationContext } from "../Context/Notifications.js";
 import { DatePicker } from "react-native-woodpicker";
 
 
+
 const heightY = Dimensions.get("window").height;
 
 const NuevoIngreso = (props) => {
-  const { user, setUser } = useContext(UserContext);
+ 
+  const { users, currentUserId } = useContext(UserContext);
+  const currentUser = users.filter((user) => user.Uid === currentUserId);
   const { sendPushNotification } = useContext(NotificationContext);
   const inicialState = {
     Renfo: "",
@@ -38,7 +41,8 @@ const NuevoIngreso = (props) => {
     Vencimiento: "",
     Observaciones: "",
     // Actas: "",
-    Notificacion: ""
+    Notificacion: "",
+    Color: 0
   }
   const [ingreso, setIngreso] = useState(inicialState);
   
@@ -55,12 +59,12 @@ const NuevoIngreso = (props) => {
   const saveNewIngreso = async () => {
     if (!ingreso.Nombre) {
       Alert.alert("", "Complete todos los campos");
-    } else if (ingreso.Notificacion < new Date()) {
+    } else if (ingreso.Notificacion && ingreso.Notificacion < new Date()) {
       Alert.alert("", "La fecha de notificación debe ser posterior a la actual");
     } else 
       try {
         setLoading(true);
-        const docRef = await addDoc(collection(db, "Viveros"), {
+        await addDoc(collection(db, "Viveros"), {
           Renfo: ingreso.Renfo,
           Nombre: ingreso.Nombre,
           Localidad: ingreso.Localidad,
@@ -76,6 +80,13 @@ const NuevoIngreso = (props) => {
           // Actas: ingreso.Actas,
           Notificacion: ingreso.Notificacion,
           createdAt: new Date(),
+          Color: ingreso.Color
+        });
+       await addDoc(collection(db, "Registros"), {
+          User: currentUser[0].Nombre,
+          Nombre: ingreso.Nombre,
+          Accion: "agregó el vivero",
+          createdAt: new Date(),
         });
         showToast();
         sendPushNotification(ingreso, "agregó");
@@ -86,6 +97,7 @@ const NuevoIngreso = (props) => {
         alert(e);
       }
   };
+
 
   return (
     <>

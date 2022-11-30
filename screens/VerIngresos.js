@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useLayoutEffect, useCallback } from "react";
 import {
   StyleSheet,
   View,
@@ -8,6 +8,8 @@ import {
   Text,
   Alert,
   Dimensions,
+  Modal,
+  Linking
 } from "react-native";
 import { ListItem, Avatar } from "@rneui/themed";
 import { ScrollView } from "react-native-gesture-handler";
@@ -29,18 +31,36 @@ import { UserContext } from "../Context/UserContext";
 import { Button } from "@rneui/base";
 import { auth } from "../database/firebase.js";
 import { signOut } from "firebase/auth";
-// import Dialog from "react-native-dialog";
 import * as Notifications from "expo-notifications";
+import * as Application from 'expo-application';
+import { Searchbar } from 'react-native-paper';
+
 
 const heightY = Dimensions.get("window").height;
 const VerIngresos = (props) => {
+  // const navigation = useNavigation();
   const { user, setUser, loading, setLoading, setUsers, setCurrentUserId } = useContext(UserContext);
   const [ingresos, setIngresos] = useState([]);
+  const [ingresosFiltered, setIngresosFiltered] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [ingresoinModal, setIngresoinModal] = useState([]);
   const [orden, setOrden] = useState("vencimiento");
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const handleText = (date) => {
+  useEffect(() => {  
+            if (searchQuery) {
+            setIngresosFiltered(ingresosFiltered.filter((ingreso) => {
+            return ingreso.Nombre.toUpperCase().indexOf(searchQuery.toUpperCase()) > -1
+            || ingreso.Renfo.toUpperCase().indexOf(searchQuery.toUpperCase()) > -1
+            || ingreso.ExpElec.toUpperCase().indexOf(searchQuery.toUpperCase()) > -1
+            }))}
+            else {
+              setIngresosFiltered(ingresos)
+            }
+            }, [searchQuery])
+  
+
+  const handleDate = (date) => {
     if(!date) {return "No se ha seleccionado ninguna fecha"}
     const ano= date.getFullYear()
     const mes=date.getMonth()+1
@@ -48,35 +68,82 @@ const VerIngresos = (props) => {
     return day+"/"+mes+"/"+ano
   }
 
+  const handleColor = ({ingreso}) => {
+    if (ingreso.Color) {    
+      switch (ingreso.Color) {
+        case 1: return  ["rgb(221, 83, 83)", "rgb(237, 219, 192)"]
+        case 2: return  ["green", "lightgreen"]
+        case 3: return  ["#FF884B", "#FFAD6098"]
+        case 4: return  ["#FFB200", "#FFF4CF"]          
+        default:break
+      }}
+    if (ingreso.Vencimiento) { 
+      if (ingreso.Vencimiento.toDate() < new Date()) return ["rgb(221, 83, 83)", "rgb(237, 219, 192)"]
+      if (((ingreso.Vencimiento.toDate() - new Date()) / 1000 /60 /60 /24) < 90) return ["#FF884B", "#FFAD6098"]
+      if (((ingreso.Vencimiento.toDate() - new Date()) / 1000 /60 /60 /24) < 240) return ["#FFB200", "#FFF4CF"]}
+    return ["green", "lightgreen"]
+  }
+
   useEffect(() => {
-    const collectionRef = collection(db, "Viveros");
+    const collectionRef = collection(db, "Aplicacion");
+    const q = query(collectionRef)
+    const unsub = onSnapshot(doc(db, "Aplicacion", "Version"), (doc) => {
+      if (doc.data().actual !== Application.nativeApplicationVersion ){
+        Alert.alert(
+          "Hay una versión de la aplicación disponible",
+          "¿Desea descargarla?",
+          [
+            { text: "Confirmar", onPress: () => Linking.openURL(doc.data().updateLink)},
+            { text: "Cancelar", onPress: () => console.log("canceled") },
+          ],
+          {
+            cancelable: true,
+          }
+        );
+      }
+  });  
+  }, [])
+  
+
+  useEffect(() => {
+    const collectionRef = collection(db, "Viveros");  
     const q = orden === "vencimiento"
       ? query(collectionRef, orderBy("Vencimiento", "asc"))
       : orden === "nombre" ? 
        query(collectionRef, orderBy("Nombre", "asc")) 
       : query(collectionRef, orderBy("Localidad", "asc")) ;
     const unsuscribe = onSnapshot(q, (querySnapshot) => {
-      setIngresos(
-        querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          Renfo: doc.data().Renfo,
-          Nombre: doc.data().Nombre,
-          Localidad: doc.data().Localidad,
-          Titular: doc.data().Titular,
-          Teltitular: doc.data().Teltitular,
-          RespTecnico: doc.data().RespTecnico,
-          TelRespTecnico: doc.data().TelRespTecnico,
-          Mail: doc.data().Mail,
-          ExpElec: doc.data().ExpElec,
-          FechaHabilitacion: doc.data().FechaHabilitacion,
-          Vencimiento: doc.data().Vencimiento,
-          Observaciones: doc.data().Observaciones,
-          Actas: doc.data().Actas,
-          Notificacion: doc.data().Notificacion,
-          createdAt: doc.data().createdAt,
-        }))
-      );
-      setLoading(false);
+      const Data =  querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        Renfo: doc.data().Renfo,
+        Nombre: doc.data().Nombre,
+        Localidad: doc.data().Localidad,
+        Titular: doc.data().Titular,
+        Teltitular: doc.data().Teltitular,
+        RespTecnico: doc.data().RespTecnico,
+        TelRespTecnico: doc.data().TelRespTecnico,
+        Mail: doc.data().Mail,
+        ExpElec: doc.data().ExpElec,
+        FechaHabilitacion: doc.data().FechaHabilitacion,
+        Vencimiento: doc.data().Vencimiento,
+        Observaciones: doc.data().Observaciones,
+        Notificacion: doc.data().Notificacion,
+        createdAt: doc.data().createdAt,
+        Color: doc.data().Color
+      }))
+      if (orden === "vencimiento") {        
+        console.log("venc")
+        const DataRed = Data.filter((el) => el.Color === 1)
+        const DataNoRed = Data.filter((el) => el.Color !== 1)
+        DataNoRed.map((data)=> DataRed.push(data))
+        setIngresos(DataRed)
+        setIngresosFiltered(DataRed)
+        setLoading(false)
+      } else
+      {console.log("entre")
+      setIngresos(Data)
+      setIngresosFiltered(Data)  
+      setLoading(false)}
     });
     return unsuscribe;
   }, [orden]);
@@ -90,7 +157,7 @@ const VerIngresos = (props) => {
         Notifications.scheduleNotificationAsync({
           content: {
             title: `Este es un recordatorio del vivero ${ingreso.Nombre}`,
-            body: `La habilitación vence el día ${handleText(ingreso.Vencimiento.toDate())}`,
+            body: `La habilitación vence el día ${handleDate(ingreso.Vencimiento.toDate())}`,
           },
           trigger: { seconds: triggerSec},
         })}}
@@ -116,7 +183,7 @@ const VerIngresos = (props) => {
             })
             .catch((error) => {
               setLoading(false);
-              console.log(error);
+              Alert.alert(error);
             });
           },
         },
@@ -134,10 +201,16 @@ const VerIngresos = (props) => {
       </View>
     );
   }
-
   return (
     <>
       <View style={styles.container}>
+      <View style={{flexDirection: 'row'}}>
+      <Searchbar
+      placeholder="Buscar"
+      onChangeText={(query) => setSearchQuery(query)}
+      value={searchQuery}
+      style={styles.searchBar}
+    />
         <TouchableOpacity
           style={styles.text}
           onPress={() => orden === "vencimiento" ? setOrden("nombre") :
@@ -146,16 +219,13 @@ const VerIngresos = (props) => {
         >
           <Text>Ordenado por: {orden}</Text>
         </TouchableOpacity>
+        </View>
         <ScrollView>
-          {ingresos?.map((ingreso) => {
+          {ingresosFiltered?.map((ingreso) => {
             return (
               <LinearGradient
                 key={ingreso.id}
-                colors={
-                  // !ingreso.Trabajando
-                  //   ? 
-                    ["green", "lightgreen"]
-                    // : ["rgb(221, 83, 83)", "rgb(237, 219, 192)"]
+                colors={handleColor({ingreso})
                 }
                 style={styles.listacontainer}
               >
@@ -171,7 +241,6 @@ const VerIngresos = (props) => {
                   tension={100}
                   activeScale={0.95}
                 >
-                  {/* <Avatar size={45} rounded title={ingreso.Prioridad} /> */}
 
                   <ListItem.Content>
                     <ListItem.Title style={styles.title}>
@@ -184,7 +253,7 @@ const VerIngresos = (props) => {
                     </ListItem.Subtitle>
                     {ingreso.Vencimiento && (
                       <ListItem.Subtitle>
-                         Fecha de vencimiento: {handleText(ingreso.Vencimiento.toDate())}
+                         Fecha de vencimiento: {handleDate(ingreso.Vencimiento.toDate())}
                       </ListItem.Subtitle>
                     )}
                     {ingreso.Observaciones && (
@@ -199,6 +268,7 @@ const VerIngresos = (props) => {
           })}
         </ScrollView>
       </View>
+     
       <TouchableOpacity
         onPress={() =>
           props.navigation.navigate("NuevoIngreso")
@@ -216,6 +286,20 @@ const VerIngresos = (props) => {
       >
         Cerrar sesión
       </Button>
+      <Button
+        containerStyle={styles.button2}
+        color="#D49B54"
+        onPress={() => props.navigation.navigate("Registros")}
+      >
+        Ver Registros
+      </Button>
+      {/* <Button
+        containerStyle={styles.button2}
+        color="#D49B54"
+        onPress={() => setIsModalInspOpen(!isModalInspOpen)}
+      >
+        Cambiar inspección
+      </Button> */}
       <MyModal
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}
@@ -278,7 +362,14 @@ const styles = StyleSheet.create({
   },
   text: {
     alignItems: "flex-end",
-    width: "96%",
+    width: "50%",
+    alignContent: "center",
+    marginTop: 0,
+    // backgroundColor: 'blue',
+    height: '75%',
+    marginTop: '2%'
+    // justifyContent: "center"
+
   },
   title: {
     fontSize: heightY * 0.029,
@@ -311,16 +402,50 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   button2: {
-    left: "43.5%",
+    left: "37.3%",
     right: 0,
     top: "91%",
     bottom: 0,
     position: "absolute",
     borderRadius: 50,
-    width: "33%",
+    width: "45%",
     height: 46,
-    backgroundColor: "rgb(221, 83, 83)",
   },
+  modal: {
+    marginTop: '150%',
+    backgroundColor: "gray",
+    alignItems: "center",
+    margin: 20,
+    borderRadius: 16,
+    paddingHorizontal: 30,
+    paddingVertical: 20,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    // backgroundColor: "blue",
+    // height: '80%',
+    justifyContent: "flex-end"
+  },
+  searchBar: {
+    width: '50%', 
+    height: '70%',
+     backgroundColor: '#EBE6E6', 
+     borderColor: 'white'
+  },
+  modalContainer: {
+    // flex: 1,
+    // justifyContent: "flex-end",
+    // alignContent: "flex-end",
+    // backgroundColor: "blue",
+    // height: '100%'
+  },
+  
+
 });
 
 export default VerIngresos;

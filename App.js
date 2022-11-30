@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+// import { createNativeStackNavigator  } from "@react-navigation/stack";
 import { UserContext, UserProvider } from "./Context/UserContext";
 import Login from "./screens/Login";
 import { NotificationsProvider } from "./Context/Notifications";
@@ -9,6 +10,7 @@ import NuevoIngreso from "./screens/NuevoIngreso";
 import IngresoDetalle from "./screens/IngresoDetalle";
 import Actas from "./screens/Actas";
 import * as Notifications from 'expo-notifications';
+import Registros from "./screens/Registros";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -18,7 +20,7 @@ Notifications.setNotificationHandler({
   }),
 });
 
-const Stack = createStackNavigator();
+const Stack = createNativeStackNavigator();
 function MyStack() {
   const { currentUserId } = useContext(UserContext);
   console.log(currentUserId)
@@ -46,6 +48,11 @@ function MyStack() {
         name="Actas"
         component={Actas}
         options={{ title: "Actas" }}
+      />
+      <Stack.Screen
+        name="Registros"
+        component={Registros}
+        options={{ title: "Registros" }}
       />
     </Stack.Navigator>
   );

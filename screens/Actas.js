@@ -25,6 +25,9 @@ import {
 } from "firebase/storage";
 import ImageViewer from "react-native-image-zoom-viewer";
 import { NotificationContext } from "../Context/Notifications.js";
+import { UserContext } from "../Context/UserContext";
+import { addDoc, collection } from "firebase/firestore";
+import { db } from "../database/firebase.js";
 
 const Actas = (props) => {
   const [images, setImages] = useState([]);
@@ -38,6 +41,8 @@ const Actas = (props) => {
   const [flash, setFlash] = useState(Camera.Constants.FlashMode.off);
   const cameraRef = useRef(null);
   const { sendPushNotification } = useContext(NotificationContext);
+  const { users, currentUserId } = useContext(UserContext);
+  const currentUser = users.filter((user) => user.Uid === currentUserId);
 
   const takeImages = async () => {
     setImages([]);
@@ -94,7 +99,7 @@ const Actas = (props) => {
     );
     uploadBytes(storageRef, blob)
       .then(() => {
-        sendPushNotification(props.route.params.ingreso, "agregó un acta en");
+        // sendPushNotification(props.route.params.ingreso, "agregó un acta en");
         takeImages().catch((error) => {
           setLoading(false);
           Alert.alert("", error);
@@ -105,6 +110,12 @@ const Actas = (props) => {
         setLoading(false);
         Alert.alert("", error);
       });
+      await addDoc(collection(db, "Registros"), {
+        User: currentUser[0].Nombre,
+        Nombre: props.route.params.ingreso.Nombre,
+        Accion: "agregó un acta al vivero",
+        createdAt: new Date(),
+      });  
   };
 
   const alertaConfirmacion = () => {
@@ -129,7 +140,7 @@ const Actas = (props) => {
     );
   };
 
-  const deleteImage = () => {
+  const deleteImage = async () => {
     setLoading(true);
     const path = images[imageSelected - 1].path;
     const desertRef = ref(storage, path);
@@ -142,6 +153,12 @@ const Actas = (props) => {
         Alert.alert(error);
         setLoading(false);
       });
+      await addDoc(collection(db, "Registros"), {
+        User: currentUser[0].Nombre,
+        Nombre: props.route.params.ingreso.Nombre,
+        Accion: "eliminó un acta del vivero",
+        createdAt: new Date(),
+      });    
   };
 
   const takePicture = async () => {

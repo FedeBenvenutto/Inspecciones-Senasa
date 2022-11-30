@@ -8,17 +8,19 @@ import {
   View
 } from "react-native";
 import { DatePicker } from "react-native-woodpicker";
+import SelectDropdown from "react-native-select-dropdown";
 
 const heightY = Dimensions.get("window").height;
 const widthX = Dimensions.get("window").width;
 const Formulario = ({ ingreso, setIngreso }) => {
-const handleText = (date) => {
+const handleDate = (date) => {
     if(!date) {return "Seleccione una fecha"}
     const ano= date.getFullYear()
     const mes=date.getMonth()+1
     const day=date.getDate()
     return day+"/"+mes+"/"+ano
   }
+const colorData = ["Auto", "Rojo", "Verde", "Naranja", "Amarillo"]  
 
   return (
     <>
@@ -112,7 +114,7 @@ const handleText = (date) => {
           value={ingreso.FechaHabilitacion}
           onDateChange={(date) => setIngreso({ ...ingreso, FechaHabilitacion: date })}
           title="Date Picker"
-          text={handleText(ingreso.FechaHabilitacion)}
+          text={handleDate(ingreso.FechaHabilitacion)}
           isNullable={false}
           style={styles.pickerStyle}
           androidDisplay="default"
@@ -125,7 +127,7 @@ const handleText = (date) => {
           value={ingreso.Vencimiento}
           onDateChange={(date) => setIngreso({ ...ingreso, Vencimiento: date })}
           title="Date Picker"
-          text={handleText(ingreso.Vencimiento)}
+          text={handleDate(ingreso.Vencimiento)}
           isNullable={false}
           style={styles.pickerStyle}
           androidDisplay="default"
@@ -138,13 +140,24 @@ const handleText = (date) => {
           value={ingreso.Notificacion}
           onDateChange={(date) => setIngreso({ ...ingreso, Notificacion: date })}
           title="Date Picker"
-          text={handleText(ingreso.Notificacion)}
+          text={handleDate(ingreso.Notificacion)}
           isNullable={false}
           style={styles.pickerStyle}
           androidDisplay="default"
           textInputStyle={styles.textPicker}
         />
       </View>
+      <SafeAreaView style={styles.formulario}>
+          <Text style={styles.text}> Color </Text>
+          <SelectDropdown
+            data={colorData}
+            buttonStyle={styles.dropdown}
+            onSelect={(selectedItem, index) => {setIngreso({ ...ingreso, Color: index })         
+            }}
+            dropdownStyle={{ marginStart: "10%", width: "30%" }}
+            defaultValueByIndex={ingreso.Color}
+          />
+        </SafeAreaView>
       <SafeAreaView style={styles.formulario}>
         <Text style={styles.text}> Observaciones</Text>
         <TextInput
@@ -156,17 +169,6 @@ const handleText = (date) => {
           }
         ></TextInput>
       </SafeAreaView>
-      {/* <SafeAreaView style={styles.formulario}>
-        <Text style={styles.text}> Actas</Text>
-        <TextInput
-          style={styles.input3}
-          multiline
-          value={ingreso.Actas}
-          onChangeText={(value) =>
-            setIngreso({ ...ingreso, Actas: value })
-          }
-        ></TextInput>
-      </SafeAreaView> */}
     </>
   );
 };
@@ -221,6 +223,13 @@ const styles = StyleSheet.create({
   textPicker: {
     alignSelf: "center",
     fontSize: heightY * 0.02,
+  },
+  dropdown: {
+    alignItems: "center",
+    borderWidth: 0.5,
+    borderColor: "#444",
+    borderRadius: 10,
+    marginTop: 10,
   },
 });
 
