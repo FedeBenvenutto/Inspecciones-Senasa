@@ -9,7 +9,6 @@ import {
   ActivityIndicator,
   Dimensions,
   ScrollView,
-  Image,
 } from "react-native";
 import { Button } from "@rneui/themed";
 import Formulario from "../Components/Formulario.js";
@@ -31,13 +30,12 @@ const IngresoDetalle = (props) => {
     Vencimiento: "",
     Observaciones: "",
     Notificacion: "",
-    // Actas: "",
     Color: 0
   }
 
   const [ingreso, setIngreso] = useState(inicialState);
   const [loading, setLoading] = useState(true);
-  const { users, currentUserId } = useContext(UserContext);
+  const { users, currentUserId, sendPushNotification } = useContext(UserContext);
   const currentUser = users.filter((user) => user.Uid === currentUserId);
 
   const getIngresoById = async (id) => {
@@ -111,7 +109,6 @@ const IngresoDetalle = (props) => {
           FechaHabilitacion: ingreso.FechaHabilitacion,
           Vencimiento: ingreso.Vencimiento,
           Observaciones: ingreso.Observaciones,
-          // Actas: ingreso.Actas,
           Notificacion: ingreso.Notificacion,
           createdAt: new Date(),
           Color: ingreso.Color
@@ -123,7 +120,7 @@ const IngresoDetalle = (props) => {
           Accion: "actualizó el vivero",
           createdAt: new Date(),
         });
-        // sendPushNotification(ingreso, "actualizó");
+        sendPushNotification(ingreso, "actualizó");
         setLoading(false);
         Alert.alert("", "Actualizado");
         props.navigation.navigate("VerIngresos");

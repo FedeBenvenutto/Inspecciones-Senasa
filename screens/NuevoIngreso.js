@@ -15,18 +15,15 @@ import Toast from "react-native-toast-message";
 import Formulario from "../Components/Formulario.js";
 // import fondo from "../assets/fondo3.jpg";
 import { UserContext } from "../Context/UserContext";
-import { NotificationContext } from "../Context/Notifications.js";
-import { DatePicker } from "react-native-woodpicker";
-
 
 
 const heightY = Dimensions.get("window").height;
 
 const NuevoIngreso = (props) => {
  
-  const { users, currentUserId } = useContext(UserContext);
+  const { users, currentUserId, sendPushNotification } = useContext(UserContext);
   const currentUser = users.filter((user) => user.Uid === currentUserId);
-  const { sendPushNotification } = useContext(NotificationContext);
+
   const inicialState = {
     Renfo: "",
     Nombre: "",
@@ -40,7 +37,6 @@ const NuevoIngreso = (props) => {
     FechaHabilitacion: "",
     Vencimiento: "",
     Observaciones: "",
-    // Actas: "",
     Notificacion: "",
     Color: 0
   }
@@ -77,7 +73,6 @@ const NuevoIngreso = (props) => {
           FechaHabilitacion: ingreso.FechaHabilitacion,
           Vencimiento: ingreso.Vencimiento,
           Observaciones: ingreso.Observaciones,
-          // Actas: ingreso.Actas,
           Notificacion: ingreso.Notificacion,
           createdAt: new Date(),
           Color: ingreso.Color

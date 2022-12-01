@@ -24,7 +24,7 @@ import {
   deleteObject,
 } from "firebase/storage";
 import ImageViewer from "react-native-image-zoom-viewer";
-import { NotificationContext } from "../Context/Notifications.js";
+
 import { UserContext } from "../Context/UserContext";
 import { addDoc, collection } from "firebase/firestore";
 import { db } from "../database/firebase.js";
@@ -40,8 +40,7 @@ const Actas = (props) => {
   const [type, setType] = useState(Camera.Constants.Type.back);
   const [flash, setFlash] = useState(Camera.Constants.FlashMode.off);
   const cameraRef = useRef(null);
-  const { sendPushNotification } = useContext(NotificationContext);
-  const { users, currentUserId } = useContext(UserContext);
+  const { users, currentUserId, sendPushNotification  } = useContext(UserContext);
   const currentUser = users.filter((user) => user.Uid === currentUserId);
 
   const takeImages = async () => {
@@ -99,7 +98,7 @@ const Actas = (props) => {
     );
     uploadBytes(storageRef, blob)
       .then(() => {
-        // sendPushNotification(props.route.params.ingreso, "agregó un acta en");
+        sendPushNotification(props.route.params.ingreso, "agregó un acta en");
         takeImages().catch((error) => {
           setLoading(false);
           Alert.alert("", error);

@@ -8,7 +8,6 @@ import {
   Text,
   Alert,
   Dimensions,
-  Modal,
   Linking
 } from "react-native";
 import { ListItem, Avatar } from "@rneui/themed";
@@ -39,7 +38,7 @@ import { Searchbar } from 'react-native-paper';
 const heightY = Dimensions.get("window").height;
 const VerIngresos = (props) => {
   // const navigation = useNavigation();
-  const { user, setUser, loading, setLoading, setUsers, setCurrentUserId } = useContext(UserContext);
+  const { loading, setLoading, setUsers, setCurrentUserId } = useContext(UserContext);
   const [ingresos, setIngresos] = useState([]);
   const [ingresosFiltered, setIngresosFiltered] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -132,15 +131,13 @@ const VerIngresos = (props) => {
         Color: doc.data().Color
       }))
       if (orden === "vencimiento") {        
-        console.log("venc")
         const DataRed = Data.filter((el) => el.Color === 1)
         const DataNoRed = Data.filter((el) => el.Color !== 1)
         DataNoRed.map((data)=> DataRed.push(data))
         setIngresos(DataRed)
         setIngresosFiltered(DataRed)
         setLoading(false)
-      } else
-      {console.log("entre")
+      } else {
       setIngresos(Data)
       setIngresosFiltered(Data)  
       setLoading(false)}
@@ -194,6 +191,7 @@ const VerIngresos = (props) => {
       }
     );
   };
+
   if (loading) {
     return (
       <View style={styles.loader}>
@@ -201,6 +199,7 @@ const VerIngresos = (props) => {
       </View>
     );
   }
+  
   return (
     <>
       <View style={styles.container}>

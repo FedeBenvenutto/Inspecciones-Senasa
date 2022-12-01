@@ -85,11 +85,11 @@ const Registros = (props) => {
             }
             return (
               <View key={registro.id} style={{ flexDirection: "row" }}>
-                <Text style={{ fontWeight: "800" }}>
+                <Text style={{ fontWeight: "800", width: '35%' }}>
                   {" "}
                   {diasemana} {dia} {mes} {hora}:{minuto}:{" "}
                 </Text>
-                <Text style={{ flexWrap: "wrap", width: "70%" }}>
+                <Text style={{ flexWrap: "wrap", width: "65%"}}>
                   {registro.User} {registro.Accion} {registro.Nombre}{" "}
                 </Text>
               </View>

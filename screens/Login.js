@@ -15,28 +15,31 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 // import fondo from "../assets/fondo3.jpg";
 import { auth } from "../database/firebase";
 import { UserContext } from "../Context/UserContext";
-import { NotificationContext } from "../Context/Notifications";
-import { doc, setDoc } from "firebase/firestore";
+// import { NotificationContext } from "../Context/Notifications";
+import { doc, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "../database/firebase.js";
 
 
 const heightY = Dimensions.get("window").height;
 const widthX = Dimensions.get("window").width;
-const Login = () => {
+const Login = ({expoPushToken}) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [nombre, setNombre] = useState("");
-  const { expoPushToken } = useContext(NotificationContext);
+  // const { expoPushToken } = useContext(NotificationContext);
   const { loading, setLoading, setCurrentUserId, takeUsers } = useContext(UserContext);
+  
   useEffect(() => {
     setLoading(true);
     const unsubscribe = auth.onAuthStateChanged((data) => {
       if (data) {
-        console.log("DATA OK")
+        console.log("expo"+expoPushToken)
         setCurrentUserId(data.uid);
         takeUsers()
+        updateDoc(doc(db, "Users", data.uid), {
+          Token: expoPushToken,
+        });
       } else {
-        console.log("NO DATA")
         setLoading(false);
       }
     });
@@ -50,7 +53,6 @@ const Login = () => {
     setLoading(true);
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        console.log("Signed in!");
         const user = userCredential.user;
         setCurrentUserId(user.uid);
         takeUsers()

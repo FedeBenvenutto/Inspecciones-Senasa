@@ -7,7 +7,31 @@ export const UserProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [currentUserId, setCurrentUserId] = useState(null);
   const [users, setUsers] = useState(null);
-  // console.log("User: " + users)
+
+  async function sendPushNotification(ingreso, accion) {
+    const currentUser = users.filter((user) => user.Uid === currentUserId);
+    const nocurrentUser = users.filter((user) => user.Uid !== currentUserId);
+    nocurrentUser.map(async (user) => {
+      const message = {
+        to: user.Token,
+        sound: "default",
+        title: `${currentUser[0].Nombre} ${accion}  un vivero`,
+        body: `${ingreso.Nombre} de ${ingreso.Localidad}`,
+        data: { someData: "goes here" },
+      };
+      await fetch("https://exp.host/--/api/v2/push/send", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Accept-encoding": "gzip, deflate",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(message),
+        
+      });
+    });
+  }
+  
   const takeUsers = () => {
     const collectionRef = collection(db, "Users");
       const q = query(collectionRef);
@@ -32,7 +56,8 @@ export const UserProvider = ({ children }) => {
         loading,
         users,
         setUsers,
-        takeUsers
+        takeUsers,
+        sendPushNotification
       }}
     >
       {children}
