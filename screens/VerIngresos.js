@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useContext, useLayoutEffect, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  useLayoutEffect,
+  useCallback,
+} from "react";
 import {
   StyleSheet,
   View,
@@ -8,7 +14,7 @@ import {
   Text,
   Alert,
   Dimensions,
-  Linking
+  Linking,
 } from "react-native";
 import { ListItem, Avatar } from "@rneui/themed";
 import { ScrollView } from "react-native-gesture-handler";
@@ -31,68 +37,95 @@ import { Button } from "@rneui/base";
 import { auth } from "../database/firebase.js";
 import { signOut } from "firebase/auth";
 import * as Notifications from "expo-notifications";
-import * as Application from 'expo-application';
-import { Searchbar } from 'react-native-paper';
-
+import * as Application from "expo-application";
+import { Searchbar } from "react-native-paper";
 
 const heightY = Dimensions.get("window").height;
 const VerIngresos = (props) => {
   // const navigation = useNavigation();
-  const { loading, setLoading, setUsers, setCurrentUserId } = useContext(UserContext);
+  const { loading, setLoading, setUsers, setCurrentUserId } =
+    useContext(UserContext);
   const [ingresos, setIngresos] = useState([]);
   const [ingresosFiltered, setIngresosFiltered] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [ingresoinModal, setIngresoinModal] = useState([]);
   const [orden, setOrden] = useState("vencimiento");
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
 
-  useEffect(() => {  
-            if (searchQuery) {
-            setIngresosFiltered(ingresosFiltered.filter((ingreso) => {
-            return ingreso.Nombre.toUpperCase().indexOf(searchQuery.toUpperCase()) > -1
-            || ingreso.Renfo.toUpperCase().indexOf(searchQuery.toUpperCase()) > -1
-            || ingreso.ExpElec.toUpperCase().indexOf(searchQuery.toUpperCase()) > -1
-            }))}
-            else {
-              setIngresosFiltered(ingresos)
-            }
-            }, [searchQuery])
-  
+  useEffect(() => {
+    if (searchQuery) {
+      setIngresosFiltered(
+        ingresosFiltered.filter((ingreso) => {
+          return (
+            ingreso.Nombre.toUpperCase().indexOf(searchQuery.toUpperCase()) >
+              -1 ||
+            ingreso.Renfo.toUpperCase().indexOf(searchQuery.toUpperCase()) >
+              -1 ||
+            ingreso.ExpElec.toUpperCase().indexOf(searchQuery.toUpperCase()) >
+              -1
+          );
+        })
+      );
+    } else {
+      setIngresosFiltered(ingresos);
+    }
+  }, [searchQuery]);
 
   const handleDate = (date) => {
-    if(!date) {return "No se ha seleccionado ninguna fecha"}
-    const ano= date.getFullYear()
-    const mes=date.getMonth()+1
-    const day=date.getDate()
-    return day+"/"+mes+"/"+ano
-  }
+    if (!date) {
+      return "No se ha seleccionado ninguna fecha";
+    }
+    const ano = date.getFullYear();
+    const mes = date.getMonth() + 1;
+    const day = date.getDate();
+    return day + "/" + mes + "/" + ano;
+  };
 
-  const handleColor = ({ingreso}) => {
-    if (ingreso.Color) {    
+  const handleColor = ({ ingreso }) => {
+    if (ingreso.Color) {
       switch (ingreso.Color) {
-        case 1: return  ["rgb(221, 83, 83)", "rgb(237, 219, 192)"]
-        case 2: return  ["green", "lightgreen"]
-        case 3: return  ["#FF884B", "#FFAD6098"]
-        case 4: return  ["#FFB200", "#FFF4CF"]          
-        default:break
-      }}
-    if (ingreso.Vencimiento) { 
-      if (ingreso.Vencimiento.toDate() < new Date()) return ["rgb(221, 83, 83)", "rgb(237, 219, 192)"]
-      if (((ingreso.Vencimiento.toDate() - new Date()) / 1000 /60 /60 /24) < 90) return ["#FF884B", "#FFAD6098"]
-      if (((ingreso.Vencimiento.toDate() - new Date()) / 1000 /60 /60 /24) < 240) return ["#FFB200", "#FFF4CF"]}
-    return ["green", "lightgreen"]
-  }
+        case 1:
+          return ["rgb(221, 83, 83)", "rgb(237, 219, 192)"];
+        case 2:
+          return ["green", "lightgreen"];
+        case 3:
+          return ["#FF884B", "#FFAD6098"];
+        case 4:
+          return ["#FFB200", "#FFF4CF"];
+        default:
+          break;
+      }
+    }
+    if (ingreso.Vencimiento) {
+      if (ingreso.Vencimiento.toDate() < new Date())
+        return ["rgb(221, 83, 83)", "rgb(237, 219, 192)"];
+      if (
+        (ingreso.Vencimiento.toDate() - new Date()) / 1000 / 60 / 60 / 24 <
+        90
+      )
+        return ["#FF884B", "#FFAD6098"];
+      if (
+        (ingreso.Vencimiento.toDate() - new Date()) / 1000 / 60 / 60 / 24 <
+        240
+      )
+        return ["#FFB200", "#FFF4CF"];
+    }
+    return ["green", "lightgreen"];
+  };
 
   useEffect(() => {
     const collectionRef = collection(db, "Aplicacion");
-    const q = query(collectionRef)
+    const q = query(collectionRef);
     const unsub = onSnapshot(doc(db, "Aplicacion", "Version"), (doc) => {
-      if (doc.data().actual !== Application.nativeApplicationVersion ){
+      if (doc.data().actual !== Application.nativeApplicationVersion) {
         Alert.alert(
           "Hay una versión de la aplicación disponible",
           "¿Desea descargarla?",
           [
-            { text: "Confirmar", onPress: () => Linking.openURL(doc.data().updateLink)},
+            {
+              text: "Confirmar",
+              onPress: () => Linking.openURL(doc.data().updateLink),
+            },
             { text: "Cancelar", onPress: () => console.log("canceled") },
           ],
           {
@@ -100,19 +133,19 @@ const VerIngresos = (props) => {
           }
         );
       }
-  });  
-  }, [])
-  
+    });
+  }, []);
 
   useEffect(() => {
-    const collectionRef = collection(db, "Viveros");  
-    const q = orden === "vencimiento"
-      ? query(collectionRef, orderBy("Vencimiento", "asc"))
-      : orden === "nombre" ? 
-       query(collectionRef, orderBy("Nombre", "asc")) 
-      : query(collectionRef, orderBy("Localidad", "asc")) ;
+    const collectionRef = collection(db, "Viveros");
+    const q =
+      orden === "vencimiento"
+        ? query(collectionRef, orderBy("Vencimiento", "asc"))
+        : orden === "nombre"
+        ? query(collectionRef, orderBy("Nombre", "asc"))
+        : query(collectionRef, orderBy("Localidad", "asc"));
     const unsuscribe = onSnapshot(q, (querySnapshot) => {
-      const Data =  querySnapshot.docs.map((doc) => ({
+      const Data = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         Renfo: doc.data().Renfo,
         Nombre: doc.data().Nombre,
@@ -128,40 +161,46 @@ const VerIngresos = (props) => {
         Observaciones: doc.data().Observaciones,
         Notificacion: doc.data().Notificacion,
         createdAt: doc.data().createdAt,
-        Color: doc.data().Color
-      }))
-      if (orden === "vencimiento") {        
-        const DataRed = Data.filter((el) => el.Color === 1)
-        const DataNoRed = Data.filter((el) => el.Color !== 1)
-        DataNoRed.map((data)=> DataRed.push(data))
-        setIngresos(DataRed)
-        setIngresosFiltered(DataRed)
-        setLoading(false)
+        Color: doc.data().Color,
+      }));
+      if (orden === "vencimiento") {
+        const DataRed = Data.filter((el) => el.Color === 1);
+        const DataNoRed = Data.filter((el) => el.Color !== 1);
+        DataNoRed.map((data) => DataRed.push(data));
+        setIngresos(DataRed);
+        setIngresosFiltered(DataRed);
+        setLoading(false);
       } else {
-      setIngresos(Data)
-      setIngresosFiltered(Data)  
-      setLoading(false)}
+        setIngresos(Data);
+        setIngresosFiltered(Data);
+        setLoading(false);
+      }
     });
     return unsuscribe;
   }, [orden]);
 
   useEffect(() => {
     if (ingresos[0]) {
-      Notifications.cancelAllScheduledNotificationsAsync()
+      Notifications.cancelAllScheduledNotificationsAsync();
       ingresos.map((ingreso) => {
         if (ingreso.Vencimiento && ingreso.Notificacion) {
-        let triggerSec = ingreso.Notificacion && Math.ceil((ingreso.Notificacion.toDate() - new Date()) /1000);
-        Notifications.scheduleNotificationAsync({
-          content: {
-            title: `Este es un recordatorio del vivero ${ingreso.Nombre}`,
-            body: `La habilitación vence el día ${handleDate(ingreso.Vencimiento.toDate())}`,
-          },
-          trigger: { seconds: triggerSec},
-        })}}
-      )
+          let triggerSec =
+            ingreso.Notificacion &&
+            Math.ceil((ingreso.Notificacion.toDate() - new Date()) / 1000);
+          Notifications.scheduleNotificationAsync({
+            content: {
+              title: `Este es un recordatorio del vivero ${ingreso.Nombre}`,
+              body: `La habilitación vence el día ${handleDate(
+                ingreso.Vencimiento.toDate()
+              )}`,
+            },
+            trigger: { seconds: triggerSec },
+          });
+        }
+      });
     }
-  }, [ingresos])
-  
+  }, [ingresos]);
+
   const alertaConfirmacion = () => {
     Alert.alert(
       "Cerrando sesión",
@@ -172,16 +211,16 @@ const VerIngresos = (props) => {
           onPress: () => {
             setLoading(true);
             signOut(auth)
-            .then(() => {
-              setLoading(false);
-              console.log("Sign-out successful");
-              setCurrentUserId(null);
-              setUsers(null);
-            })
-            .catch((error) => {
-              setLoading(false);
-              Alert.alert(error);
-            });
+              .then(() => {
+                setLoading(false);
+                console.log("Sign-out successful");
+                setCurrentUserId(null);
+                setUsers(null);
+              })
+              .catch((error) => {
+                setLoading(false);
+                Alert.alert(error);
+              });
           },
         },
         { text: "Cancelar", onPress: () => console.log("canceled") },
@@ -199,33 +238,36 @@ const VerIngresos = (props) => {
       </View>
     );
   }
-  
+
   return (
     <>
       <View style={styles.container}>
-      <View style={{flexDirection: 'row'}}>
-      <Searchbar
-      placeholder="Buscar"
-      onChangeText={(query) => setSearchQuery(query)}
-      value={searchQuery}
-      style={styles.searchBar}
-    />
-        <TouchableOpacity
-          style={styles.text}
-          onPress={() => orden === "vencimiento" ? setOrden("nombre") :
-        orden === "nombre" ? setOrden("localidad")
-         : setOrden("vencimiento")}
-        >
-          <Text>Ordenado por: {orden}</Text>
-        </TouchableOpacity>
+        <View style={{ flexDirection: "row" }}>
+          <Searchbar
+            placeholder="Buscar"
+            onChangeText={(query) => setSearchQuery(query)}
+            value={searchQuery}
+            style={styles.searchBar}
+          />
+          <TouchableOpacity
+            style={styles.text}
+            onPress={() =>
+              orden === "vencimiento"
+                ? setOrden("nombre")
+                : orden === "nombre"
+                ? setOrden("localidad")
+                : setOrden("vencimiento")
+            }
+          >
+            <Text>Ordenado por: {orden}</Text>
+          </TouchableOpacity>
         </View>
         <ScrollView>
           {ingresosFiltered?.map((ingreso) => {
             return (
               <LinearGradient
                 key={ingreso.id}
-                colors={handleColor({ingreso})
-                }
+                colors={handleColor({ ingreso })}
                 style={styles.listacontainer}
               >
                 <ListItem
@@ -240,19 +282,19 @@ const VerIngresos = (props) => {
                   tension={100}
                   activeScale={0.95}
                 >
-
                   <ListItem.Content>
                     <ListItem.Title style={styles.title}>
                       {ingreso.Nombre.toUpperCase()}
                     </ListItem.Title>
-                    <ListItem.Subtitle 
+                    <ListItem.Subtitle
                     // style={styles.title}
                     >
                       Localidad: {ingreso.Localidad}
                     </ListItem.Subtitle>
                     {ingreso.Vencimiento && (
                       <ListItem.Subtitle>
-                         Fecha de vencimiento: {handleDate(ingreso.Vencimiento.toDate())}
+                        Fecha de vencimiento:{" "}
+                        {handleDate(ingreso.Vencimiento.toDate())}
                       </ListItem.Subtitle>
                     )}
                     {ingreso.Observaciones && (
@@ -267,11 +309,9 @@ const VerIngresos = (props) => {
           })}
         </ScrollView>
       </View>
-     
+
       <TouchableOpacity
-        onPress={() =>
-          props.navigation.navigate("NuevoIngreso")
-        }
+        onPress={() => props.navigation.navigate("NuevoIngreso")}
         style={styles.iconcontainer}
       >
         <View style={styles.iconview}>
@@ -365,16 +405,15 @@ const styles = StyleSheet.create({
     alignContent: "center",
     marginTop: 0,
     // backgroundColor: 'blue',
-    height: '75%',
-    marginTop: '2%'
+    height: "75%",
+    marginTop: "2%",
     // justifyContent: "center"
-
   },
   title: {
     fontSize: heightY * 0.029,
     fontWeight: "700",
     marginBottom: 10,
-    alignSelf: 'center'
+    alignSelf: "center",
   },
   listacontainer: {
     borderRadius: 35,
@@ -411,7 +450,7 @@ const styles = StyleSheet.create({
     height: 46,
   },
   modal: {
-    marginTop: '150%',
+    marginTop: "150%",
     backgroundColor: "gray",
     alignItems: "center",
     margin: 20,
@@ -428,13 +467,13 @@ const styles = StyleSheet.create({
     elevation: 5,
     // backgroundColor: "blue",
     // height: '80%',
-    justifyContent: "flex-end"
+    justifyContent: "flex-end",
   },
   searchBar: {
-    width: '50%', 
-    height: '70%',
-     backgroundColor: '#EBE6E6', 
-     borderColor: 'white'
+    width: "50%",
+    height: "70%",
+    backgroundColor: "#EBE6E6",
+    borderColor: "white",
   },
   modalContainer: {
     // flex: 1,
@@ -443,8 +482,6 @@ const styles = StyleSheet.create({
     // backgroundColor: "blue",
     // height: '100%'
   },
-  
-
 });
 
 export default VerIngresos;

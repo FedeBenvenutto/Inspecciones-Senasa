@@ -33,12 +33,8 @@ const Login = ({expoPushToken}) => {
     setLoading(true);
     const unsubscribe = auth.onAuthStateChanged((data) => {
       if (data) {
-        console.log("expo"+expoPushToken)
-        setCurrentUserId(data.uid);
         takeUsers()
-        updateDoc(doc(db, "Users", data.uid), {
-          Token: expoPushToken,
-        });
+        setCurrentUserId(data.uid);
       } else {
         setLoading(false);
       }

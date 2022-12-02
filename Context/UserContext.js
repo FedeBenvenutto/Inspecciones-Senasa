@@ -1,6 +1,7 @@
 import React, { useState, useEffect, createContext } from "react";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { db } from "../database/firebase";
+import { Alert } from "react-native";
 
 export const UserContext = createContext();
 export const UserProvider = ({ children }) => {
@@ -31,21 +32,24 @@ export const UserProvider = ({ children }) => {
       });
     });
   }
-  
+
   const takeUsers = () => {
-    const collectionRef = collection(db, "Users");
-      const q = query(collectionRef);
-       onSnapshot(q, (querySnapshot) => {
-        setUsers(
-          querySnapshot.docs.map((doc) => ({
-            Mail: doc.data().Mail,
-            Token: doc.data().Token,
-            Uid: doc.data().Uid,
-            Nombre: doc.data().Nombre,
-          }))
-        );
-      });
-      }
+    try {
+      const collectionRef = collection(db, "Users");
+        const q = query(collectionRef);
+         onSnapshot(q, (querySnapshot) => {
+          setUsers(
+            querySnapshot.docs.map((doc) => ({
+              Mail: doc.data().Mail,
+              Token: doc.data().Token,
+              Uid: doc.data().Uid,
+              Nombre: doc.data().Nombre,
+            }))
+          );
+        });  
+    } catch (error) {
+      Alert.alert("Se produjo un error obteniendo los usuarios de la aplicación:" + error)
+    }}
 
   return (
     <UserContext.Provider
