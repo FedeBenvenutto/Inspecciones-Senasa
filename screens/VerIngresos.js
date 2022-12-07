@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  useContext,
-  useLayoutEffect,
-  useCallback,
-} from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   StyleSheet,
   View,
@@ -16,7 +10,7 @@ import {
   Dimensions,
   Linking,
 } from "react-native";
-import { ListItem, Avatar } from "@rneui/themed";
+import { ListItem } from "@rneui/themed";
 import { ScrollView } from "react-native-gesture-handler";
 import { db } from "../database/firebase.js";
 import {
@@ -24,33 +18,42 @@ import {
   onSnapshot,
   orderBy,
   query,
-  deleteDoc,
   doc,
 } from "firebase/firestore";
-import plus from "../assets/plus.png";
 import MyModal from "../Components/Modal.js";
 import TouchableScale from "react-native-touchable-scale";
 import { LinearGradient } from "expo-linear-gradient";
-// import fondo from "../assets/fondo3.jpg";
 import { UserContext } from "../Context/UserContext";
-import { Button } from "@rneui/base";
-import { auth } from "../database/firebase.js";
-import { signOut } from "firebase/auth";
 import * as Notifications from "expo-notifications";
 import * as Application from "expo-application";
 import { Searchbar } from "react-native-paper";
+import { DrawerView } from "../Components/DrawerView";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Animated, {
+  interpolate,
+  useAnimatedStyle,
+} from "react-native-reanimated";
+import { useDrawerProgress } from "@react-navigation/drawer";
+import Icon from "react-native-vector-icons/FontAwesome";
+import girasol from "../assets/girasol.jpg";
 
 const heightY = Dimensions.get("window").height;
 const VerIngresos = (props) => {
-  // const navigation = useNavigation();
-  const { loading, setLoading, setUsers, setCurrentUserId } =
-    useContext(UserContext);
+  const { loading, setLoading } = useContext(UserContext);
   const [ingresos, setIngresos] = useState([]);
   const [ingresosFiltered, setIngresosFiltered] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [ingresoinModal, setIngresoinModal] = useState([]);
   const [orden, setOrden] = useState("vencimiento");
   const [searchQuery, setSearchQuery] = useState("");
+  const drawerProgress = useDrawerProgress();
+
+  const viewStyles = useAnimatedStyle(() => {
+    const borderRadius = interpolate(drawerProgress.value, [0, 1], [0, 40]);
+    return {
+      borderRadius,
+    };
+  });
 
   useEffect(() => {
     if (searchQuery) {
@@ -201,36 +204,6 @@ const VerIngresos = (props) => {
     }
   }, [ingresos]);
 
-  const alertaConfirmacion = () => {
-    Alert.alert(
-      "Cerrando sesión",
-      "¿Esta seguro?",
-      [
-        {
-          text: "Confirmar",
-          onPress: () => {
-            setLoading(true);
-            signOut(auth)
-              .then(() => {
-                setLoading(false);
-                console.log("Sign-out successful");
-                setCurrentUserId(null);
-                setUsers(null);
-              })
-              .catch((error) => {
-                setLoading(false);
-                Alert.alert(error);
-              });
-          },
-        },
-        { text: "Cancelar", onPress: () => console.log("canceled") },
-      ],
-      {
-        cancelable: true,
-      }
-    );
-  };
-
   if (loading) {
     return (
       <View style={styles.loader}>
@@ -240,8 +213,20 @@ const VerIngresos = (props) => {
   }
 
   return (
-    <>
-      <View style={styles.container}>
+    <DrawerView style={styles.container}>
+      <Animated.Image
+        source={girasol}
+        style={[styles.bgimage, StyleSheet.absoluteFill, viewStyles]}
+      />
+      <SafeAreaView style={{ height: "97%" }}>
+        <Icon
+          name="bars"
+          size={25}
+          color={"gray"}
+          style={{ marginStart: 10 }}
+          onPress={() => props.navigation.toggleDrawer()}
+        />
+        <Text style={styles.titulo}>VIVEROS</Text>
         <View style={{ flexDirection: "row" }}>
           <Searchbar
             placeholder="Buscar"
@@ -286,9 +271,7 @@ const VerIngresos = (props) => {
                     <ListItem.Title style={styles.title}>
                       {ingreso.Nombre.toUpperCase()}
                     </ListItem.Title>
-                    <ListItem.Subtitle
-                    // style={styles.title}
-                    >
+                    <ListItem.Subtitle>
                       Localidad: {ingreso.Localidad}
                     </ListItem.Subtitle>
                     {ingreso.Vencimiento && (
@@ -308,53 +291,22 @@ const VerIngresos = (props) => {
             );
           })}
         </ScrollView>
-      </View>
+      </SafeAreaView>
 
-      <TouchableOpacity
-        onPress={() => props.navigation.navigate("NuevoIngreso")}
-        style={styles.iconcontainer}
-      >
-        <View style={styles.iconview}>
-          <Image source={plus} style={styles.icon}></Image>
-        </View>
-      </TouchableOpacity>
-      <Button
-        containerStyle={styles.button}
-        color="rgb(221, 83, 83)"
-        onPress={() => alertaConfirmacion()}
-      >
-        Cerrar sesión
-      </Button>
-      <Button
-        containerStyle={styles.button2}
-        color="#D49B54"
-        onPress={() => props.navigation.navigate("Registros")}
-      >
-        Ver Registros
-      </Button>
-      {/* <Button
-        containerStyle={styles.button2}
-        color="#D49B54"
-        onPress={() => setIsModalInspOpen(!isModalInspOpen)}
-      >
-        Cambiar inspección
-      </Button> */}
       <MyModal
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}
         ingresoinModal={ingresoinModal}
         props={props}
       />
-    </>
+    </DrawerView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 10,
-    maxHeight: "87%",
-    backgroundColor: "transparent",
+    backgroundColor: "white",
   },
   alertContainer: {
     backgroundColor: "#fff",
@@ -404,10 +356,7 @@ const styles = StyleSheet.create({
     width: "50%",
     alignContent: "center",
     marginTop: 0,
-    // backgroundColor: 'blue',
-    height: "75%",
     marginTop: "2%",
-    // justifyContent: "center"
   },
   title: {
     fontSize: heightY * 0.029,
@@ -423,31 +372,6 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     resizeMode: "cover",
-  },
-  button: {
-    left: 10,
-    right: 0,
-    top: "91%",
-    bottom: 0,
-    position: "absolute",
-    borderRadius: 50,
-    width: "33%",
-    height: 46,
-    backgroundColor: "rgb(221, 83, 83)",
-    alignContent: "center",
-    alignSelf: "center",
-    textAlignVertical: "center",
-    alignItems: "center",
-  },
-  button2: {
-    left: "37.3%",
-    right: 0,
-    top: "91%",
-    bottom: 0,
-    position: "absolute",
-    borderRadius: 50,
-    width: "45%",
-    height: 46,
   },
   modal: {
     marginTop: "150%",
@@ -465,8 +389,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
-    // backgroundColor: "blue",
-    // height: '80%',
     justifyContent: "flex-end",
   },
   searchBar: {
@@ -475,12 +397,21 @@ const styles = StyleSheet.create({
     backgroundColor: "#EBE6E6",
     borderColor: "white",
   },
-  modalContainer: {
-    // flex: 1,
-    // justifyContent: "flex-end",
-    // alignContent: "flex-end",
-    // backgroundColor: "blue",
-    // height: '100%'
+  titulo: {
+    alignItems: "center",
+    fontSize: heightY * 0.039,
+    justifyContent: "center",
+    textAlign: "center",
+    color: "black",
+    marginBottom: 10,
+    fontWeight: "bold",
+  },
+  bgimage: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
+    opacity: 0.3,
+    backgroundColor: "white",
   },
 });
 

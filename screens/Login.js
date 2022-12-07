@@ -12,28 +12,28 @@ import {
   Dimensions,
 } from "react-native";
 import { signInWithEmailAndPassword } from "firebase/auth";
-// import fondo from "../assets/fondo3.jpg";
 import { auth } from "../database/firebase";
 import { UserContext } from "../Context/UserContext";
-// import { NotificationContext } from "../Context/Notifications";
-import { doc, setDoc, updateDoc } from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 import { db } from "../database/firebase.js";
-
+import senasa from "../assets/senasa.png";
+import girasol from "../assets/girasol.jpg";
 
 const heightY = Dimensions.get("window").height;
 const widthX = Dimensions.get("window").width;
-const Login = ({expoPushToken}) => {
+const Login = ({ expoPushToken }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [nombre, setNombre] = useState("");
   // const { expoPushToken } = useContext(NotificationContext);
-  const { loading, setLoading, setCurrentUserId, takeUsers } = useContext(UserContext);
-  
+  const { loading, setLoading, setCurrentUserId, takeUsers } =
+    useContext(UserContext);
+
   useEffect(() => {
     setLoading(true);
     const unsubscribe = auth.onAuthStateChanged((data) => {
       if (data) {
-        takeUsers()
+        takeUsers();
         setCurrentUserId(data.uid);
       } else {
         setLoading(false);
@@ -43,15 +43,15 @@ const Login = ({expoPushToken}) => {
   }, []);
 
   const handleSignIn = () => {
-    if (!email) return Alert.alert("", "Ingrese el e-mail")
-    if (!password) return Alert.alert("", "Ingrese la contraseña")
+    if (!email) return Alert.alert("", "Ingrese el e-mail");
+    if (!password) return Alert.alert("", "Ingrese la contraseña");
     if (!nombre) return Alert.alert("", "Ingrese un nombre");
     setLoading(true);
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         const user = userCredential.user;
         setCurrentUserId(user.uid);
-        takeUsers()
+        takeUsers();
         setDoc(doc(db, "Users", user.uid), {
           Nombre: nombre,
           Uid: user.uid,
@@ -81,12 +81,18 @@ const Login = ({expoPushToken}) => {
           errorMessage ==
           "FirebaseError: Firebase: Error (auth/internal-error)."
         ) {
-          Alert.alert("", "Se encontró un error inesperado. Por favor reintente");
+          Alert.alert(
+            "",
+            "Se encontró un error inesperado. Por favor reintente"
+          );
         } else if (
           errorMessage ==
           "FirebaseError: Firebase: Error (auth/network-request-failed)."
         ) {
-          Alert.alert("", "No se pudo conectar al servidor. Chequee su conexión a internet y reintente");
+          Alert.alert(
+            "",
+            "No se pudo conectar al servidor. Chequee su conexión a internet y reintente"
+          );
         } else {
           Alert.alert(errorMessage);
         }
@@ -101,21 +107,25 @@ const Login = ({expoPushToken}) => {
   }
   return (
     <View style={styles.container}>
-      {/* <Image source={fondo} style={[styles.image, StyleSheet.absoluteFill]} /> */}
+      <Image
+        source={girasol}
+        style={[styles.bgimage, StyleSheet.absoluteFill]}
+      />
       <ScrollView contentContainerStyle={styles.blurview}>
         <View style={styles.login}>
           <View>
-            <Text style={styles.titulo}>Inspecciones Senasa</Text>
+            <Image source={senasa} style={styles.image} />
+            <Text style={styles.titulo}>INSPECCIONES</Text>
           </View>
           <View>
-              <Text style={styles.tituloinput}>Nombre</Text>
-              <TextInput
-                value={nombre}
-                onChangeText={(text) => setNombre(text.trim())}
-                style={styles.input}
-                placeholder="Nombre"
-              />
-            </View>
+            <Text style={styles.tituloinput}>Nombre</Text>
+            <TextInput
+              value={nombre}
+              onChangeText={(text) => setNombre(text.trim())}
+              style={styles.input}
+              placeholder="Nombre"
+            />
+          </View>
           <View>
             <Text style={styles.tituloinput}>E-mail</Text>
             <TextInput
@@ -165,7 +175,7 @@ const styles = StyleSheet.create({
     fontSize: heightY * 0.05,
     fontWeight: "700",
     color: "black",
-    marginBottom: 50,
+    marginBottom: 20,
     textAlign: "center",
   },
   tituloinput: {
@@ -173,7 +183,7 @@ const styles = StyleSheet.create({
     fontWeight: "400",
     color: "black",
   },
-  image: {
+  bgimage: {
     width: "100%",
     height: "100%",
     resizeMode: "cover",
@@ -187,7 +197,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
     alignItems: "center",
-    backgroundColor: "#E5EBB230",
+    backgroundColor: "#FFEFD6",
   },
   input: {
     width: 250,
@@ -225,5 +235,12 @@ const styles = StyleSheet.create({
     position: "absolute",
     alignItems: "center",
     justifyContent: "center",
+  },
+  image: {
+    height: 100,
+    width: 300,
+    resizeMode: "cover",
+    marginStart: "0%",
+    borderRadius: 10,
   },
 });

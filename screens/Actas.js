@@ -6,7 +6,8 @@ import {
   Alert,
   Modal,
   ActivityIndicator,
-  TouchableOpacity, Text
+  Text,
+  Dimensions,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { Camera, CameraType } from "expo-camera";
@@ -24,10 +25,19 @@ import {
   deleteObject,
 } from "firebase/storage";
 import ImageViewer from "react-native-image-zoom-viewer";
-
 import { UserContext } from "../Context/UserContext";
 import { addDoc, collection } from "firebase/firestore";
 import { db } from "../database/firebase.js";
+import { DrawerView } from "../Components/DrawerView";
+import Icon from "react-native-vector-icons/FontAwesome";
+import girasol from "../assets/girasol.jpg";
+import Animated, {
+  interpolate,
+  useAnimatedStyle,
+} from "react-native-reanimated";
+import { useDrawerProgress } from "@react-navigation/drawer";
+
+const heightY = Dimensions.get("window").height;
 
 const Actas = (props) => {
   const [images, setImages] = useState([]);
@@ -40,8 +50,16 @@ const Actas = (props) => {
   const [type, setType] = useState(Camera.Constants.Type.back);
   const [flash, setFlash] = useState(Camera.Constants.FlashMode.off);
   const cameraRef = useRef(null);
-  const { users, currentUserId, sendPushNotification  } = useContext(UserContext);
+  const { users, currentUserId, sendPushNotification } =
+    useContext(UserContext);
   const currentUser = users.filter((user) => user.Uid === currentUserId);
+  const drawerProgress = useDrawerProgress();
+  const viewStyles = useAnimatedStyle(() => {
+    const borderRadius = interpolate(drawerProgress.value, [0, 1], [0, 40]);
+    return {
+      borderRadius,
+    };
+  });
 
   const takeImages = async () => {
     setImages([]);
@@ -109,12 +127,12 @@ const Actas = (props) => {
         setLoading(false);
         Alert.alert("", error);
       });
-      await addDoc(collection(db, "Registros"), {
-        User: currentUser[0].Nombre,
-        Nombre: props.route.params.ingreso.Nombre,
-        Accion: "agregó un acta al vivero",
-        createdAt: new Date(),
-      });  
+    await addDoc(collection(db, "Registros"), {
+      User: currentUser[0].Nombre,
+      Nombre: props.route.params.ingreso.Nombre,
+      Accion: "agregó un acta al vivero",
+      createdAt: new Date(),
+    });
   };
 
   const alertaConfirmacion = () => {
@@ -152,12 +170,12 @@ const Actas = (props) => {
         Alert.alert(error);
         setLoading(false);
       });
-      await addDoc(collection(db, "Registros"), {
-        User: currentUser[0].Nombre,
-        Nombre: props.route.params.ingreso.Nombre,
-        Accion: "eliminó un acta del vivero",
-        createdAt: new Date(),
-      });    
+    await addDoc(collection(db, "Registros"), {
+      User: currentUser[0].Nombre,
+      Nombre: props.route.params.ingreso.Nombre,
+      Accion: "eliminó un acta del vivero",
+      createdAt: new Date(),
+    });
   };
 
   const takePicture = async () => {
@@ -200,13 +218,12 @@ const Actas = (props) => {
       <View style={styles.loader}>
         <ActivityIndicator size="large" color="#9E9E9E" />
         <Button
-          buttonStyle={{ backgroundColor: "gray"}}
+          buttonStyle={{ backgroundColor: "gray" }}
           title="Volver"
           onPress={() => {
             setLoading(false);
             props.navigation.navigate("VerIngresos");
           }}
-          // containerStyle={{position: 'absolute', top: '60%'}}
         />
       </View>
     );
@@ -215,7 +232,7 @@ const Actas = (props) => {
   if (camaraOpen) {
     if (hasCameraPermission === false) {
       Alert.alert("", "Se deben conceder permisos para usar la Cámara");
-      setCamaraOpen(false)
+      setCamaraOpen(false);
     }
     return (
       <View style={styles.camaraContainer}>
@@ -301,7 +318,19 @@ const Actas = (props) => {
     );
   }
   return (
-    <>
+    <DrawerView style={styles.container}>
+      <Animated.Image
+        source={girasol}
+        style={[styles.bgimage, StyleSheet.absoluteFill, viewStyles]}
+      />
+      <Icon
+        name="bars"
+        size={25}
+        color={"gray"}
+        style={{ marginStart: 10, marginTop: "15%" }}
+        onPress={() => props.navigation.toggleDrawer()}
+      />
+      <Text style={styles.titulo}>ACTAS</Text>
       <ImageViewer
         imageUrls={images}
         saveToLocalByLongPress={false}
@@ -315,11 +344,11 @@ const Actas = (props) => {
         enablePreload={true}
       />
 
-      <Modal 
-      visible={modalVisible} 
-      onRequestClose={() => {
-        setModalVisible(!modalVisible);
-      }}
+      <Modal
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}
       >
         <ImageViewer
           imageUrls={images}
@@ -335,7 +364,7 @@ const Actas = (props) => {
           enablePreload={true}
         />
       </Modal>
-      <View style={styles.container}>
+      <View style={{ marginTop: 50 }}>
         <Button
           containerStyle={styles.button}
           title="Agregar acta desde la galería"
@@ -353,15 +382,14 @@ const Actas = (props) => {
           onPress={() => alertaConfirmacion()}
         />
       </View>
-    </>
+    </DrawerView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: "white",
   },
 
   camaraContainer: {
@@ -378,8 +406,6 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     height: "13%",
     width: "80%",
-    // flexDirection: "row",
-    // alignItems: "center",
     justifyContent: "center",
     marginTop: 10,
     marginLeft: 50,
@@ -405,6 +431,21 @@ const styles = StyleSheet.create({
     position: "absolute",
     alignItems: "center",
     justifyContent: "center",
+  },
+  titulo: {
+    alignItems: "center",
+    fontSize: heightY * 0.039,
+    justifyContent: "center",
+    textAlign: "center",
+    color: "black",
+    marginBottom: 50,
+    fontWeight: "bold",
+  },
+  bgimage: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
+    opacity: 0.3,
   },
 });
 

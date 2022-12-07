@@ -5,7 +5,7 @@ import {
   SafeAreaView,
   StyleSheet,
   Dimensions,
-  View
+  View,
 } from "react-native";
 import { DatePicker } from "react-native-woodpicker";
 import SelectDropdown from "react-native-select-dropdown";
@@ -13,14 +13,16 @@ import SelectDropdown from "react-native-select-dropdown";
 const heightY = Dimensions.get("window").height;
 const widthX = Dimensions.get("window").width;
 const Formulario = ({ ingreso, setIngreso }) => {
-const handleDate = (date) => {
-    if(!date) {return "Seleccione una fecha"}
-    const ano= date.getFullYear()
-    const mes=date.getMonth()+1
-    const day=date.getDate()
-    return day+"/"+mes+"/"+ano
-  }
-const colorData = ["Auto", "Rojo", "Verde", "Naranja", "Amarillo"]  
+  const handleDate = (date) => {
+    if (!date) {
+      return "Seleccione una fecha";
+    }
+    const ano = date.getFullYear();
+    const mes = date.getMonth() + 1;
+    const day = date.getDate();
+    return day + "/" + mes + "/" + ano;
+  };
+  const colorData = ["Auto", "Rojo", "Verde", "Naranja", "Amarillo"];
 
   return (
     <>
@@ -67,7 +69,9 @@ const colorData = ["Auto", "Rojo", "Verde", "Naranja", "Amarillo"]
           keyboardType="phone-pad"
           name="Teltitular"
           value={ingreso.Teltitular}
-          onChangeText={(value) => setIngreso({ ...ingreso, Teltitular: value })}
+          onChangeText={(value) =>
+            setIngreso({ ...ingreso, Teltitular: value })
+          }
         ></TextInput>
       </SafeAreaView>
       <SafeAreaView style={styles.formulario}>
@@ -76,7 +80,9 @@ const colorData = ["Auto", "Rojo", "Verde", "Naranja", "Amarillo"]
           style={styles.input2}
           name="RespTecnico"
           value={ingreso.RespTecnico}
-          onChangeText={(value) => setIngreso({ ...ingreso, RespTecnico: value })}
+          onChangeText={(value) =>
+            setIngreso({ ...ingreso, RespTecnico: value })
+          }
         ></TextInput>
       </SafeAreaView>
       <SafeAreaView style={styles.formulario}>
@@ -86,7 +92,9 @@ const colorData = ["Auto", "Rojo", "Verde", "Naranja", "Amarillo"]
           keyboardType="phone-pad"
           name="TelRespTecnico"
           value={ingreso.TelRespTecnico}
-          onChangeText={(value) => setIngreso({ ...ingreso, TelRespTecnico: value })}
+          onChangeText={(value) =>
+            setIngreso({ ...ingreso, TelRespTecnico: value })
+          }
         ></TextInput>
       </SafeAreaView>
       <SafeAreaView style={styles.formulario}>
@@ -112,7 +120,9 @@ const colorData = ["Auto", "Rojo", "Verde", "Naranja", "Amarillo"]
         <Text style={styles.text}> Fecha habilitación </Text>
         <DatePicker
           value={ingreso.FechaHabilitacion}
-          onDateChange={(date) => setIngreso({ ...ingreso, FechaHabilitacion: date })}
+          onDateChange={(date) =>
+            setIngreso({ ...ingreso, FechaHabilitacion: date })
+          }
           title="Date Picker"
           text={handleDate(ingreso.FechaHabilitacion)}
           isNullable={false}
@@ -138,7 +148,9 @@ const colorData = ["Auto", "Rojo", "Verde", "Naranja", "Amarillo"]
         <Text style={styles.text}> Fecha de Notificación</Text>
         <DatePicker
           value={ingreso.Notificacion}
-          onDateChange={(date) => setIngreso({ ...ingreso, Notificacion: date })}
+          onDateChange={(date) =>
+            setIngreso({ ...ingreso, Notificacion: date })
+          }
           title="Date Picker"
           text={handleDate(ingreso.Notificacion)}
           isNullable={false}
@@ -148,16 +160,17 @@ const colorData = ["Auto", "Rojo", "Verde", "Naranja", "Amarillo"]
         />
       </View>
       <SafeAreaView style={styles.formulario}>
-          <Text style={styles.text}> Color </Text>
-          <SelectDropdown
-            data={colorData}
-            buttonStyle={styles.dropdown}
-            onSelect={(selectedItem, index) => {setIngreso({ ...ingreso, Color: index })         
-            }}
-            dropdownStyle={{ marginStart: "10%", width: "30%" }}
-            defaultValueByIndex={ingreso.Color}
-          />
-        </SafeAreaView>
+        <Text style={styles.text}> Color </Text>
+        <SelectDropdown
+          data={colorData}
+          buttonStyle={styles.dropdown}
+          onSelect={(selectedItem, index) => {
+            setIngreso({ ...ingreso, Color: index });
+          }}
+          dropdownStyle={{ marginStart: "10%", width: "30%" }}
+          defaultValueByIndex={ingreso.Color}
+        />
+      </SafeAreaView>
       <SafeAreaView style={styles.formulario}>
         <Text style={styles.text}> Observaciones</Text>
         <TextInput
@@ -191,16 +204,15 @@ const styles = StyleSheet.create({
     height: 50,
     borderWidth: 0.5,
     padding: 10,
-    width: '49%',
+    width: "49%",
     // minWidth: "49%",
     fontSize: heightY * 0.023,
     borderRadius: 10,
     textAlign: "center",
     backgroundColor: "#ffffff90",
-
   },
   input3: {
-    height: 'auto',
+    height: "auto",
     borderWidth: 0.5,
     padding: 10,
     width: "49%",
@@ -230,6 +242,7 @@ const styles = StyleSheet.create({
     borderColor: "#444",
     borderRadius: 10,
     marginTop: 10,
+    backgroundColor: "white",
   },
 });
 

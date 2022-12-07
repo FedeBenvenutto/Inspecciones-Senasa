@@ -8,10 +8,12 @@ export const UserProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [currentUserId, setCurrentUserId] = useState(null);
   const [users, setUsers] = useState(null);
+  console.log(users)
+  const currentUser = users?.filter((user) => user.Uid === currentUserId);
+  const nocurrentUser = users?.filter((user) => user.Uid !== currentUserId);
 
   async function sendPushNotification(ingreso, accion) {
-    const currentUser = users.filter((user) => user.Uid === currentUserId);
-    const nocurrentUser = users.filter((user) => user.Uid !== currentUserId);
+    
     nocurrentUser.map(async (user) => {
       const message = {
         to: user.Token,
@@ -36,8 +38,8 @@ export const UserProvider = ({ children }) => {
   const takeUsers = () => {
     try {
       const collectionRef = collection(db, "Users");
-        const q = query(collectionRef);
-         onSnapshot(q, (querySnapshot) => {
+      const q = query(collectionRef);
+      onSnapshot(q, (querySnapshot) => {
           setUsers(
             querySnapshot.docs.map((doc) => ({
               Mail: doc.data().Mail,
@@ -61,7 +63,8 @@ export const UserProvider = ({ children }) => {
         users,
         setUsers,
         takeUsers,
-        sendPushNotification
+        sendPushNotification,
+        currentUser
       }}
     >
       {children}

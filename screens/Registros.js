@@ -5,11 +5,21 @@ import {
   ActivityIndicator,
   Text,
   Dimensions,
+  Image,
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { db } from "../database/firebase.js";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { UserContext } from "../Context/UserContext";
+import { DrawerView } from "../Components/DrawerView.js";
+import Icon from "react-native-vector-icons/FontAwesome";
+import { SafeAreaView } from "react-native-safe-area-context";
+import girasol from "../assets/girasol.jpg";
+import Animated, {
+  interpolate,
+  useAnimatedStyle,
+} from "react-native-reanimated";
+import { useDrawerProgress } from "@react-navigation/drawer";
 
 const heightY = Dimensions.get("window").height;
 const Registros = (props) => {
@@ -38,9 +48,16 @@ const Registros = (props) => {
     "Viernes",
     "Sábado",
   ];
-  
+  const drawerProgress = useDrawerProgress();
+  const viewStyles = useAnimatedStyle(() => {
+    const borderRadius = interpolate(drawerProgress.value, [0, 1], [0, 40]);
+    return {
+      borderRadius,
+    };
+  });
+
   useEffect(() => {
-    setLoading(true)
+    setLoading(true);
     const collectionRef = collection(db, "Registros");
     const q = query(collectionRef, orderBy("createdAt", "asc"));
     const unsuscribe = onSnapshot(q, (querySnapshot) => {
@@ -58,7 +75,6 @@ const Registros = (props) => {
     return unsuscribe;
   }, []);
 
- 
   if (loading) {
     return (
       <View style={styles.loader}>
@@ -68,10 +84,21 @@ const Registros = (props) => {
   }
 
   return (
-
-      <View style={styles.container}>
+    <DrawerView style={styles.container}>
+      <Animated.Image
+        source={girasol}
+        style={[styles.bgimage, StyleSheet.absoluteFill, viewStyles]}
+      />
+      <SafeAreaView>
+        <Icon
+          name="bars"
+          size={25}
+          color={"gray"}
+          style={{ marginStart: 10 }}
+          onPress={() => props.navigation.toggleDrawer()}
+        />
+        <Text style={styles.titulo}>REGISTRO DE ACTIVIDAD</Text>
         <ScrollView>
-          <Text style={styles.titulo}>REGISTRO DE ACTIVIDAD</Text>
           {registros?.map((registro) => {
             var dia = registro.createdAt.toDate().getDate();
             var mes = Meses[registro.createdAt.toDate().getMonth()].slice(0, 3);
@@ -85,28 +112,28 @@ const Registros = (props) => {
             }
             return (
               <View key={registro.id} style={{ flexDirection: "row" }}>
-                <Text style={{ fontWeight: "800", width: '35%' }}>
+                <Text
+                  style={{ fontWeight: "800", width: "35%", marginStart: 5 }}
+                >
                   {" "}
                   {diasemana} {dia} {mes} {hora}:{minuto}:{" "}
                 </Text>
-                <Text style={{ flexWrap: "wrap", width: "65%"}}>
+                <Text style={{ flexWrap: "wrap", width: "65%" }}>
                   {registro.User} {registro.Accion} {registro.Nombre}{" "}
                 </Text>
               </View>
             );
           })}
         </ScrollView>
-      </View>
-
+      </SafeAreaView>
+    </DrawerView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 10,
-    maxHeight: "87%",
-    backgroundColor: "transparent",
+    backgroundColor: "white",
   },
 
   loader: {
@@ -120,14 +147,20 @@ const styles = StyleSheet.create({
   },
 
   titulo: {
-    marginTop: 20,
+    marginTop: 10,
     alignItems: "center",
-    fontSize: heightY * 0.039,
+    fontSize: heightY * 0.038,
     justifyContent: "center",
     textAlign: "center",
     color: "#7c917f",
     marginBottom: 30,
     fontWeight: "bold",
+  },
+  bgimage: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
+    opacity: 0.3,
   },
 });
 

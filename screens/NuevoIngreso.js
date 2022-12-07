@@ -13,8 +13,13 @@ import { db } from "../database/firebase.js";
 import { addDoc, collection } from "firebase/firestore";
 import Toast from "react-native-toast-message";
 import Formulario from "../Components/Formulario.js";
-// import fondo from "../assets/fondo3.jpg";
 import { UserContext } from "../Context/UserContext";
+import { DrawerView } from "../Components/DrawerView.js";
+import Icon from 'react-native-vector-icons/FontAwesome';
+import { SafeAreaView } from "react-native-safe-area-context";
+import girasol from "../assets/girasol.jpg";
+import Animated, { interpolate, useAnimatedStyle } from "react-native-reanimated";
+import { useDrawerProgress} from "@react-navigation/drawer";
 
 
 const heightY = Dimensions.get("window").height;
@@ -23,7 +28,13 @@ const NuevoIngreso = (props) => {
  
   const { users, currentUserId, sendPushNotification } = useContext(UserContext);
   const currentUser = users.filter((user) => user.Uid === currentUserId);
-
+  const drawerProgress = useDrawerProgress();
+  const viewStyles = useAnimatedStyle(() => {
+    const borderRadius = interpolate(drawerProgress.value, [0, 1], [0, 40]);
+    return {
+      borderRadius 
+    };
+  });
   const inicialState = {
     Renfo: "",
     Nombre: "",
@@ -95,10 +106,12 @@ const NuevoIngreso = (props) => {
 
 
   return (
-    <>
-      {/* <Image source={fondo} style={[styles.image, StyleSheet.absoluteFill]} /> */}
-      <ScrollView style={styles.container}>
+    <DrawerView style={styles.container}>
+       <Animated.Image source={girasol} style={[styles.bgimage, StyleSheet.absoluteFill, viewStyles]} />
+      <SafeAreaView style={{height: '97%'}}>
+        <Icon name="bars" size={25} color={'gray'} style={{marginStart: 10}} onPress={()=> props.navigation.toggleDrawer()}/>
         <Text style={styles.titulo}>INGRESO NUEVO VIVERO</Text>
+      <ScrollView >
         <Formulario ingreso={ingreso} setIngreso={setIngreso} />
         <View style={styles.buttton}>
           {loading ? (
@@ -114,23 +127,26 @@ const NuevoIngreso = (props) => {
         </View>
         <View style={styles.buttton}></View>
       </ScrollView>
+      </SafeAreaView>
       <Toast />
-    </>
+    </DrawerView>
   );
 };
 
 const styles = StyleSheet.create({
   titulo: {
-    marginTop: 20,
+    marginTop: 10,
     alignItems: "center",
     fontSize: heightY * 0.039,
     justifyContent: "center",
     textAlign: "center",
     color: "#7c917f",
-    marginBottom: 30,
+    marginBottom: 20,
     fontWeight: "bold",
   },
-  container: {},
+  container: {
+    backgroundColor: 'white'
+  },
   buttton: {
     width: "88%",
     alignContent: "center",
@@ -138,11 +154,12 @@ const styles = StyleSheet.create({
     marginStart: 25,
     borderRadius: 15,
   },
-  image: {
+
+  bgimage: {
     width: "100%",
     height: "100%",
     resizeMode: "cover",
-    opacity: 0.3,
+    opacity: 0.2,
   },
 });
 
