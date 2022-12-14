@@ -36,6 +36,8 @@ import Animated, {
 import { useDrawerProgress } from "@react-navigation/drawer";
 import Icon from "react-native-vector-icons/FontAwesome";
 import girasol from "../assets/girasol.jpg";
+import { StatusBar } from "expo-status-bar";
+import NetInfo from "@react-native-community/netinfo";
 
 const heightY = Dimensions.get("window").height;
 const VerIngresos = (props) => {
@@ -44,9 +46,13 @@ const VerIngresos = (props) => {
   const [ingresosFiltered, setIngresosFiltered] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [ingresoinModal, setIngresoinModal] = useState([]);
+  const [isConnected, setIsConnected] = useState(false);
   const [orden, setOrden] = useState("vencimiento");
   const [searchQuery, setSearchQuery] = useState("");
   const drawerProgress = useDrawerProgress();
+  NetInfo.fetch().then((state) => {
+    state.isConnected ? setIsConnected(true) : setIsConnected(false);
+  });
 
   const viewStyles = useAnimatedStyle(() => {
     const borderRadius = interpolate(drawerProgress.value, [0, 1], [0, 40]);
@@ -58,7 +64,7 @@ const VerIngresos = (props) => {
   useEffect(() => {
     if (searchQuery) {
       setIngresosFiltered(
-        ingresosFiltered.filter((ingreso) => {
+        ingresos.filter((ingreso) => {
           return (
             ingreso.Nombre.toUpperCase().indexOf(searchQuery.toUpperCase()) >
               -1 ||
@@ -207,6 +213,7 @@ const VerIngresos = (props) => {
   if (loading) {
     return (
       <View style={styles.loader}>
+        <StatusBar style="dark" backgroundColor="transparent" />
         <ActivityIndicator size="large" color="#9E9E9E" />
       </View>
     );
@@ -214,6 +221,7 @@ const VerIngresos = (props) => {
 
   return (
     <DrawerView style={styles.container}>
+      <StatusBar style="dark" backgroundColor="transparent" />
       <Animated.Image
         source={girasol}
         style={[styles.bgimage, StyleSheet.absoluteFill, viewStyles]}
@@ -223,7 +231,7 @@ const VerIngresos = (props) => {
           name="bars"
           size={25}
           color={"gray"}
-          style={{ marginStart: 10 }}
+          style={{ marginStart: 15, marginTop: 10 }}
           onPress={() => props.navigation.toggleDrawer()}
         />
         <Text style={styles.titulo}>VIVEROS</Text>
@@ -410,7 +418,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     resizeMode: "cover",
-    opacity: 0.3,
+    opacity: 0.5,
     backgroundColor: "white",
   },
 });

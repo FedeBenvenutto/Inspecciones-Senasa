@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   Text,
   Dimensions,
+  TouchableOpacity,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { Camera, CameraType } from "expo-camera";
@@ -36,6 +37,7 @@ import Animated, {
   useAnimatedStyle,
 } from "react-native-reanimated";
 import { useDrawerProgress } from "@react-navigation/drawer";
+import { StatusBar } from "expo-status-bar";
 
 const heightY = Dimensions.get("window").height;
 
@@ -216,6 +218,7 @@ const Actas = (props) => {
   if (loading) {
     return (
       <View style={styles.loader}>
+        <StatusBar style="dark" backgroundColor="transparent" />
         <ActivityIndicator size="large" color="#9E9E9E" />
         <Button
           buttonStyle={{ backgroundColor: "gray" }}
@@ -327,7 +330,7 @@ const Actas = (props) => {
         name="bars"
         size={25}
         color={"gray"}
-        style={{ marginStart: 10, marginTop: "15%" }}
+        style={{ marginStart: 15, marginTop: "15%" }}
         onPress={() => props.navigation.toggleDrawer()}
       />
       <Text style={styles.titulo}>ACTAS</Text>
@@ -381,6 +384,18 @@ const Actas = (props) => {
           color="rgb(221, 83, 83)"
           onPress={() => alertaConfirmacion()}
         />
+        <TouchableOpacity
+          style={styles.volver}
+          onPress={() => props.navigation.navigate("VerIngresos")}
+        >
+          <Icon
+            name="arrow-left"
+            size={20}
+            color={"black"}
+            style={{ marginVertical: 4 }}
+          />
+          <Text style={{ fontSize: 20, marginLeft: 15 }}>Volver</Text>
+        </TouchableOpacity>
       </View>
     </DrawerView>
   );
@@ -446,6 +461,16 @@ const styles = StyleSheet.create({
     height: "100%",
     resizeMode: "cover",
     opacity: 0.3,
+  },
+  volver: {
+    flex: 1,
+    flexDirection: "row",
+    // justifyContent: 'flex-end',
+    alignItems: "flex-end",
+    // marginEnd: 20,
+    marginLeft: 10,
+    // backgroundColor: 'blue',
+    marginBottom: 25,
   },
 });
 

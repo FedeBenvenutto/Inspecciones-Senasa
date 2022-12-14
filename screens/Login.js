@@ -18,6 +18,7 @@ import { doc, setDoc } from "firebase/firestore";
 import { db } from "../database/firebase.js";
 import senasa from "../assets/senasa.png";
 import girasol from "../assets/girasol.jpg";
+import { StatusBar } from "expo-status-bar";
 
 const heightY = Dimensions.get("window").height;
 const widthX = Dimensions.get("window").width;
@@ -50,14 +51,14 @@ const Login = ({ expoPushToken }) => {
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         const user = userCredential.user;
-        setCurrentUserId(user.uid);
-        takeUsers();
         setDoc(doc(db, "Users", user.uid), {
-          Nombre: nombre,
+          Nombre: nombre.trim(),
           Uid: user.uid,
-          Mail: email,
+          Mail: email.trim(),
           Token: expoPushToken,
         });
+        setCurrentUserId(user.uid);
+        takeUsers();
       })
       .catch((error) => {
         setLoading(false);
@@ -101,12 +102,14 @@ const Login = ({ expoPushToken }) => {
   if (loading) {
     return (
       <View style={styles.loader}>
+        <StatusBar style="dark" backgroundColor="transparent" />
         <ActivityIndicator size="large" color="#9E9E9E" />
       </View>
     );
   }
   return (
     <View style={styles.container}>
+      <StatusBar style="dark" backgroundColor="transparent" />
       <Image
         source={girasol}
         style={[styles.bgimage, StyleSheet.absoluteFill]}
@@ -121,7 +124,7 @@ const Login = ({ expoPushToken }) => {
             <Text style={styles.tituloinput}>Nombre</Text>
             <TextInput
               value={nombre}
-              onChangeText={(text) => setNombre(text.trim())}
+              onChangeText={(text) => setNombre(text)}
               style={styles.input}
               placeholder="Nombre"
             />
@@ -130,7 +133,7 @@ const Login = ({ expoPushToken }) => {
             <Text style={styles.tituloinput}>E-mail</Text>
             <TextInput
               value={email}
-              onChangeText={(text) => setEmail(text.trim())}
+              onChangeText={(text) => setEmail(text)}
               style={styles.input}
               placeholder="E-mail"
               autoCapitalize="none"

@@ -20,6 +20,7 @@ import Animated, {
   useAnimatedStyle,
 } from "react-native-reanimated";
 import { useDrawerProgress } from "@react-navigation/drawer";
+import { StatusBar } from "expo-status-bar";
 
 const heightY = Dimensions.get("window").height;
 const Registros = (props) => {
@@ -78,6 +79,7 @@ const Registros = (props) => {
   if (loading) {
     return (
       <View style={styles.loader}>
+        <StatusBar style="dark" backgroundColor="transparent" />
         <ActivityIndicator size="large" color="#9E9E9E" />
       </View>
     );
@@ -94,7 +96,7 @@ const Registros = (props) => {
           name="bars"
           size={25}
           color={"gray"}
-          style={{ marginStart: 10 }}
+          style={{ marginStart: 15, marginTop: 10 }}
           onPress={() => props.navigation.toggleDrawer()}
         />
         <Text style={styles.titulo}>REGISTRO DE ACTIVIDAD</Text>

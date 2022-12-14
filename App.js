@@ -15,12 +15,22 @@ import {
   DrawerContentScrollView,
   DrawerItemList,
 } from "@react-navigation/drawer";
-import { StyleSheet, View, Text, Dimensions, Alert, Image } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  Dimensions,
+  Alert,
+  Image,
+  ActivityIndicator,
+} from "react-native";
 import { Button } from "@rneui/base";
 import { auth } from "./database/firebase.js";
 import { signOut } from "firebase/auth";
 import Icon from "react-native-vector-icons/FontAwesome";
 import senasa from "./assets/senasa.png";
+import NetInfo from "@react-native-community/netinfo";
+import { StatusBar } from "expo-status-bar";
 
 const heightY = Dimensions.get("window").height;
 
@@ -37,6 +47,13 @@ export default function App() {
   const [notification, setNotification] = useState(false);
   const notificationListener = useRef();
   const responseListener = useRef();
+  const [isConnected, setIsConnected] = useState(false);
+  useEffect(() => {
+    NetInfo.fetch().then((state) => {
+      state.isConnected ? setIsConnected(true) : setIsConnected(false);
+    });
+  }, []);
+
   async function registerForPushNotificationsAsync() {
     let token;
     if (Device.isDevice) {
@@ -51,7 +68,12 @@ export default function App() {
         alert("Hubo un error en los permisos de la notificaciones");
         return;
       }
-      token = (await Notifications.getExpoPushTokenAsync()).data;
+      token = (
+        await Notifications
+          .getExpoPushTokenAsync
+          // {experienceId:'@federicoand/Inpecciones-Senasa'}
+          ()
+      ).data;
     } else {
       alert("Must use physical device for Push Notifications");
     }
@@ -128,6 +150,26 @@ export default function App() {
         }
       );
     };
+    if (!isConnected) {
+      <StatusBar style="dark" backgroundColor="transparent" />;
+      return (
+        <View style={styles.loader}>
+          <Text> No se ha detectado una conexión a internet activa</Text>
+          <Button
+            onPress={() =>
+              NetInfo.fetch().then((state) => {
+                state.isConnected
+                  ? setIsConnected(true)
+                  : setIsConnected(false);
+              })
+            }
+          >
+            {" "}
+            Reintentar{" "}
+          </Button>
+        </View>
+      );
+    }
 
     return (
       <Drawer.Navigator
@@ -291,5 +333,14 @@ const styles = StyleSheet.create({
   },
   sceneContainer: {
     backgroundColor: "#FFEFD6",
+  },
+  loader: {
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    position: "absolute",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

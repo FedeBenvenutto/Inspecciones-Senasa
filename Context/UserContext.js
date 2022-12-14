@@ -8,7 +8,6 @@ export const UserProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [currentUserId, setCurrentUserId] = useState(null);
   const [users, setUsers] = useState(null);
-  console.log(users)
   const currentUser = users?.filter((user) => user.Uid === currentUserId);
   const nocurrentUser = users?.filter((user) => user.Uid !== currentUserId);
 

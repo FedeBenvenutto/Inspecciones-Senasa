@@ -30,6 +30,7 @@ import Animated, {
   useAnimatedStyle,
 } from "react-native-reanimated";
 import { useDrawerProgress } from "@react-navigation/drawer";
+import { StatusBar } from "expo-status-bar";
 
 const heightY = Dimensions.get("window").height;
 
@@ -52,6 +53,7 @@ const IngresoDetalle = (props) => {
   };
 
   const [ingreso, setIngreso] = useState(inicialState);
+  const [prevIngreso, setPrevIngreso] = useState(inicialState);
   const [loading, setLoading] = useState(true);
   const { users, currentUserId, sendPushNotification } =
     useContext(UserContext);
@@ -76,6 +78,13 @@ const IngresoDetalle = (props) => {
         ? ingreso.Notificacion.toDate()
         : "";
       setIngreso({
+        ...ingreso,
+        FechaHabilitacion: fechaHabilitacion,
+        Vencimiento: vencimiento,
+        Notificacion: notificacion,
+        id: doc.id,
+      });
+      setPrevIngreso({
         ...ingreso,
         FechaHabilitacion: fechaHabilitacion,
         Vencimiento: vencimiento,
@@ -128,6 +137,30 @@ const IngresoDetalle = (props) => {
     } else
       try {
         setLoading(true);
+        let cambios = [];
+        ingreso.Renfo !== prevIngreso.Renfo && cambios.push("Renfo");
+        ingreso.Nombre !== prevIngreso.Nombre && cambios.push("Nombre");
+        ingreso.Localidad !== prevIngreso.Localidad &&
+          cambios.push("Localidad");
+        ingreso.Titular !== prevIngreso.Titular && cambios.push("Titular");
+        ingreso.Teltitular !== prevIngreso.Teltitular &&
+          cambios.push("Teléfono titular");
+        ingreso.RespTecnico !== prevIngreso.RespTecnico &&
+          cambios.push("Responsable Técnico");
+        ingreso.TelRespTecnico !== prevIngreso.TelRespTecnico &&
+          cambios.push("Teléfono Técnico");
+        ingreso.Mail !== prevIngreso.Mail && cambios.push("Mail");
+        ingreso.ExpElec !== prevIngreso.ExpElec &&
+          cambios.push("Expediente electrónico");
+        ingreso.FechaHabilitacion !== prevIngreso.FechaHabilitacion &&
+          cambios.push("Fecha Habilitación");
+        ingreso.Vencimiento !== prevIngreso.Vencimiento &&
+          cambios.push("Fecha Vencimiento");
+        ingreso.Observaciones !== prevIngreso.Observaciones &&
+          cambios.push("Observaciones");
+        ingreso.Notificacion !== prevIngreso.Notificacion &&
+          cambios.push("Fecha de notificación");
+        ingreso.Color !== prevIngreso.Color && cambios.push("Importancia");
         const docRef = doc(db, "Viveros", props.route.params.ingresoId);
         const data = {
           Renfo: ingreso.Renfo,
@@ -150,7 +183,7 @@ const IngresoDetalle = (props) => {
         await addDoc(collection(db, "Registros"), {
           User: currentUser[0].Nombre,
           Nombre: ingreso.Nombre,
-          Accion: "actualizó el vivero",
+          Accion: `actualizó (${cambios.join("-")}) el vivero`,
           createdAt: new Date(),
         });
         sendPushNotification(ingreso, "actualizó");
@@ -169,6 +202,7 @@ const IngresoDetalle = (props) => {
   if (loading) {
     return (
       <View style={styles.loader}>
+        <StatusBar style="dark" backgroundColor="transparent" />
         <ActivityIndicator size="large" color="#9E9E9E" />
       </View>
     );
@@ -185,7 +219,7 @@ const IngresoDetalle = (props) => {
           name="bars"
           size={25}
           color={"gray"}
-          style={{ marginStart: 10 }}
+          style={{ marginStart: 15, marginTop: 10 }}
           onPress={() => props.navigation.toggleDrawer()}
         />
         <Text style={styles.titulo}>DETALLE CONTACTO</Text>
@@ -196,6 +230,14 @@ const IngresoDetalle = (props) => {
               containerStyle={styles.buttton}
               title="Actualizar"
               onPress={() => actualizarIngreso()}
+              color="#8FBC8F"
+            />
+          </View>
+          <View style={styles.buttton}>
+            <Button
+              containerStyle={styles.buttton}
+              title="Cancelar"
+              onPress={() => props.navigation.navigate("VerIngresos")}
               color="#8FBC8F"
             />
           </View>
