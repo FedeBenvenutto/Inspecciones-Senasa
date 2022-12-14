@@ -1,7 +1,10 @@
 # Inspecciones-Senasa
 Aplicación móvil creada con React Native, Expo y Firebase para llevar un registro de inspecciones realizadas.
+
 Permite agregar "Viveros" junto con las respectivas actas mediante fotografías guardadas o mediante la cámara.
+
 Se puede alternar los colores según se vaya acercando su vencimiento o en forma manual.
+
 Permite llamar desde la aplicación.
 Lleva un control de versiones informando cuando hay una actualización con el link de descarga
 Se implemento una navigación tipo "Drawer" personalizada.
