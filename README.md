@@ -15,7 +15,7 @@ Se agregó un buscador que permite buscar por nombre, expediente o "RENFO".
 
 Se puede ordenar los resultados por vencimiento (color), localidad o nombre.
 
-Se creó un registro un Registro de actividad de los usuarios.
+Se creó un registro un Registro de actividad de los usuarios. Envía notificaciones cuando el usuario las establezca o cuando se realice alguna actividad como agregar o modificar datos de algún vivero.
 
 Se puede descargar apk desde: https://drive.google.com/file/d/1LoRqkY1Q6LUNMPxtPlblY6DVD63oEe5W/view?usp=sharing
 
