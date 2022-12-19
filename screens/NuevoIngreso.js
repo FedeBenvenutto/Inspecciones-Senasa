@@ -23,6 +23,7 @@ import Animated, {
   useAnimatedStyle,
 } from "react-native-reanimated";
 import { useDrawerProgress } from "@react-navigation/drawer";
+import { StatusBar } from "expo-status-bar";
 
 const heightY = Dimensions.get("window").height;
 
@@ -110,6 +111,7 @@ const NuevoIngreso = (props) => {
 
   return (
     <DrawerView style={styles.container}>
+      <StatusBar style="dark" backgroundColor="transparent" />
       <Animated.Image
         source={girasol}
         style={[styles.bgimage, StyleSheet.absoluteFill, viewStyles]}

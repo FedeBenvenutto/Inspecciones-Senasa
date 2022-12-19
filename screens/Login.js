@@ -49,16 +49,20 @@ const Login = ({ expoPushToken }) => {
     if (!nombre) return Alert.alert("", "Ingrese un nombre");
     setLoading(true);
     signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
-        setDoc(doc(db, "Users", user.uid), {
-          Nombre: nombre.trim(),
-          Uid: user.uid,
-          Mail: email.trim(),
-          Token: expoPushToken,
-        });
-        setCurrentUserId(user.uid);
-        takeUsers();
+      .then(async (userCredential) => {
+        try {
+          const user = userCredential.user;
+          await setDoc(doc(db, "Users", user.uid), {
+            Nombre: nombre.trim(),
+            Uid: user.uid,
+            Mail: email.trim(),
+            Token: expoPushToken,
+          });
+          setCurrentUserId(user.uid);
+          takeUsers();
+        } catch (error) {
+          Alert.alert(error);
+        }
       })
       .catch((error) => {
         setLoading(false);

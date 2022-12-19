@@ -90,6 +90,7 @@ export default function App() {
     return token;
   }
 
+
   useEffect(() => {
     registerForPushNotificationsAsync().then((token) =>
       setExpoPushToken(token)
@@ -121,6 +122,7 @@ export default function App() {
     if (!currentUserId) {
       return <Login expoPushToken={expoPushToken} />;
     }
+    // console.log(currentUser[0])
     const alertaConfirmacion = () => {
       Alert.alert(
         "Cerrando sesión",
@@ -195,7 +197,7 @@ export default function App() {
                 <DrawerItemList {...props} />
               </DrawerContentScrollView>
               <View style={styles.view}>
-                {currentUser && (
+                {currentUser !== undefined && currentUser[0] !== undefined && (
                   <View style={{ flexDirection: "row" }}>
                     <Icon name="user-circle-o" size={25} />
                     <Text style={styles.text}>Usuario:</Text>

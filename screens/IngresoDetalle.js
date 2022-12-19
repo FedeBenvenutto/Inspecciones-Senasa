@@ -210,6 +210,7 @@ const IngresoDetalle = (props) => {
 
   return (
     <DrawerView style={styles.container}>
+      <StatusBar style="dark" backgroundColor="transparent" />
       <Animated.Image
         source={girasol}
         style={[styles.bgimage, StyleSheet.absoluteFill, viewStyles]}
