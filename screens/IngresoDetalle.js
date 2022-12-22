@@ -38,6 +38,7 @@ const IngresoDetalle = (props) => {
   const inicialState = {
     Renfo: "",
     Nombre: "",
+    Direccion: "",
     Localidad: "",
     Titular: "",
     Teltitular: "",
@@ -140,6 +141,7 @@ const IngresoDetalle = (props) => {
         let cambios = [];
         ingreso.Renfo !== prevIngreso.Renfo && cambios.push("Renfo");
         ingreso.Nombre !== prevIngreso.Nombre && cambios.push("Nombre");
+        ingreso.Direccion !== prevIngreso.Direccion && cambios.push("Dirección");
         ingreso.Localidad !== prevIngreso.Localidad &&
           cambios.push("Localidad");
         ingreso.Titular !== prevIngreso.Titular && cambios.push("Titular");
@@ -165,6 +167,7 @@ const IngresoDetalle = (props) => {
         const data = {
           Renfo: ingreso.Renfo,
           Nombre: ingreso.Nombre,
+          Direccion: ingreso.Direccion,
           Localidad: ingreso.Localidad,
           Titular: ingreso.Titular,
           Teltitular: ingreso.Teltitular,

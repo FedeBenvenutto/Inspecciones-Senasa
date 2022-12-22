@@ -41,6 +41,7 @@ const NuevoIngreso = (props) => {
   const inicialState = {
     Renfo: "",
     Nombre: "",
+    Direccion: "",
     Localidad: "",
     Titular: "",
     Teltitular: "",
@@ -79,6 +80,7 @@ const NuevoIngreso = (props) => {
         await addDoc(collection(db, "Viveros"), {
           Renfo: ingreso.Renfo,
           Nombre: ingreso.Nombre,
+          Direccion: ingreso.Direccion,
           Localidad: ingreso.Localidad,
           Titular: ingreso.Titular,
           Teltitular: ingreso.Teltitular,

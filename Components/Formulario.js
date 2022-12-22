@@ -45,6 +45,15 @@ const Formulario = ({ ingreso, setIngreso }) => {
         ></TextInput>
       </SafeAreaView>
       <SafeAreaView style={styles.formulario}>
+        <Text style={styles.text}> Dirección </Text>
+        <TextInput
+          style={styles.input2}
+          name="Direccion"
+          value={ingreso.Direccion}
+          onChangeText={(value) => setIngreso({ ...ingreso, Direccion: value })}
+        ></TextInput>
+      </SafeAreaView>
+      <SafeAreaView style={styles.formulario}>
         <Text style={styles.text}> Localidad</Text>
         <TextInput
           style={styles.input2}

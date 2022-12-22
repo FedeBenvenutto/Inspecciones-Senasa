@@ -152,12 +152,15 @@ const VerIngresos = (props) => {
         ? query(collectionRef, orderBy("Vencimiento", "asc"))
         : orden === "nombre"
         ? query(collectionRef, orderBy("Nombre", "asc"))
-        : query(collectionRef, orderBy("Localidad", "asc"));
+        : orden === "localidad" 
+        ? query(collectionRef, orderBy("Localidad", "asc"))
+        : query(collectionRef, orderBy("Renfo", "asc"));
     const unsuscribe = onSnapshot(q, (querySnapshot) => {
       const Data = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         Renfo: doc.data().Renfo,
         Nombre: doc.data().Nombre,
+        Direccion: doc.data().Direccion,
         Localidad: doc.data().Localidad,
         Titular: doc.data().Titular,
         Teltitular: doc.data().Teltitular,
@@ -249,6 +252,8 @@ const VerIngresos = (props) => {
                 ? setOrden("nombre")
                 : orden === "nombre"
                 ? setOrden("localidad")
+                : orden === "localidad" 
+                ? setOrden("Renfo")
                 : setOrden("vencimiento")
             }
           >
